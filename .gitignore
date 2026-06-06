@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+*.db
+
+# Node
+node_modules/
+dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Environment
+.env
+
+# Data (uploaded files, logs, test data)
+data/uploads/*
+!data/uploads/.gitkeep
+data/*.db
+*.xlsx
+*.xls
+*.csv
+!sample_data/*
+
+# Windows scripts
+*.ps1
+*.bat
+
+# OS
+.DS_Store
+Thumbs.db
