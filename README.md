@@ -1,8 +1,8 @@
-# 对话式数据分析师 Agent
+# DataAgent — 对话式数据分析师
 
 面向中小工厂和电商商家的 AI 数据分析助手。用自然语言提问，Agent 自动完成从数据查询到经营建议的全流程。
 
-## 功能
+## ✨ 功能
 
 - **数据接入**：上传 Excel/CSV，连接 MySQL/PostgreSQL/SQLite
 - **自然语言分析**：聊天式提问，Agent 自动生成 SQL 并执行
@@ -12,7 +12,7 @@
 - **报告导出**：一键生成 Markdown 报告
 - **多轮对话**：记住上下文，模糊时主动反问澄清
 
-## 技术栈
+## 🧱 技术栈
 
 | 层级 | 技术 |
 |------|------|
@@ -22,24 +22,25 @@
 | 系统数据库 | SQLite |
 | 前端 | Vue 3 + TDesign + ECharts + Vite |
 
-## 快速开始
+## 🚀 快速开始
 
-### 准备
+### 1. 准备
 
-1. 安装 Python 3.11+ 和 Node.js 18+
-2. 克隆项目到本地
+- Python 3.11+
+- Node.js 18+
+- 克隆项目到本地
 
-### 后端
+### 2. 后端
 
 ```bash
 cd backend
 pip install -r requirements.txt
 cp ../.env.example ../.env
-# 编辑 .env，填入 DeepSeek API Key
+# 编辑 .env，填入 DEEPSEEK_API_KEY 或其他 LLM 配置
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### 前端
+### 3. 前端
 
 ```bash
 cd frontend
@@ -47,12 +48,12 @@ npm install
 npm run dev
 ```
 
-### 访问
+### 4. 访问
 
-- 前端：http://localhost:3000
+- 前端：http://localhost:5199
 - API 文档：http://localhost:8000/docs
 
-## 项目结构
+## 📁 项目结构
 
 ```
 ├── backend/          # FastAPI 后端
@@ -75,7 +76,7 @@ npm run dev
 └── README.md
 ```
 
-## Agent 工作流
+## 🤖 Agent 工作流
 
 ```
 用户提问 → 意图识别 → SQL 生成 → 数据执行 → 结果分析
@@ -90,7 +91,7 @@ Agent 能够：
 3. **时间感知**：自动注入当前真实日期到提示词，正确理解"上个月""去年"等模糊时间表述
 4. **聚合感知**：当数据为订单级时自动添加 GROUP BY 产品维度
 
-## 环境变量
+## ⚙️ 环境变量
 
 复制 `.env.example` 为 `.env`，修改：
 
@@ -101,6 +102,15 @@ DEEPSEEK_API_KEY=sk-your-deepseek-key
 DEEPSEEK_MODEL=deepseek-chat
 ```
 
-## 许可
+## 📦 生产构建
+
+```bash
+# 前端
+cd frontend
+npm run build
+# 产物位于 frontend/dist，可部署到任意静态服务器
+```
+
+## 📝 许可
 
 MIT
