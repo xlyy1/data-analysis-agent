@@ -227,6 +227,7 @@ async def chat(
         final_response = f"分析出错：{error}"
 
     # 保存助手消息（含元数据）
+    query_result = json.loads(state.get("query_result_json") or "{}")
     metadata = {
         "sql": state.get("generated_sql", ""),
         "sql_explanation": state.get("sql_explanation", ""),
@@ -234,6 +235,9 @@ async def chat(
         "chart_config": json.loads(state.get("chart_config_json", "{}")),
         "diagnosis_causes": state.get("diagnosis_causes", []),
         "diagnosis_suggestions": state.get("diagnosis_suggestions", []),
+        # 查询结果随消息一起存，报告导出时用来生成数据表格（只留前 20 行）
+        "data_columns": query_result.get("columns", []),
+        "data_rows": (query_result.get("rows") or [])[:20],
     }
     saved = await svc.add_message(conv.id, "assistant", final_response, metadata)
 
@@ -327,9 +331,12 @@ async def chat_stream(
                     await asyncio.sleep(0.05)
 
             # 发送元数据
+            query_result = json.loads(state.get("query_result_json") or "{}")
             metadata = {
                 "sql": state.get("generated_sql", ""),
                 "chart_config": json.loads(state.get("chart_config_json", "{}")),
+                "data_columns": query_result.get("columns", []),
+                "data_rows": (query_result.get("rows") or [])[:20],
             }
             yield f"data: {json.dumps({'type': 'metadata', 'content': metadata})}\n\n"
             yield "data: [DONE]\n\n"

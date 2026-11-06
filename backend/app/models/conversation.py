@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import datetime
-from sqlalchemy import String, DateTime, Text, func
+from sqlalchemy import String, DateTime, Text, Index, func
 from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
 
@@ -20,6 +20,8 @@ class Conversation(Base):
 
 class Message(Base):
     __tablename__ = "messages"
+    # 按会话查消息是最高频的查询，联合索引同时满足过滤与排序
+    __table_args__ = (Index("idx_messages_conv_created", "conversation_id", "created_at"),)
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     conversation_id: Mapped[str] = mapped_column(String(36), nullable=False)

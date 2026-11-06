@@ -49,6 +49,10 @@ async def generate_report(
             sql = meta.get("sql", sql)
             causes = meta.get("diagnosis_causes", causes)
             suggestions = meta.get("diagnosis_suggestions", suggestions)
+            # 取最后一条带查询结果的助手消息
+            if meta.get("data_columns"):
+                data_columns = meta["data_columns"]
+                data_rows = meta.get("data_rows") or []
         analysis += msg.content + "\n"
 
     if req.format == "markdown":
