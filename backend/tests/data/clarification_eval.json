@@ -1,0 +1,32 @@
+{
+  "name": "clarification_eval_24",
+  "notes": "expect_clarify=true 表示问题缺少关键信息、系统应当反问；false 表示信息完整、应直接分析。",
+  "schema": "表名: 销售数据 (Excel)\n列: 订单ID(int), 订单日期(date, 2026-01~2026-03), 产品名称(text), 产品类别(text), 销售渠道(text), 销量(int), 单价(元)(float), 销售额(元)(float), 成本(元)(float), 利润(元)(float), 客户城市(text)\n行数: 51\n可计算指标: 毛利率=利润/销售额, 客单价=销售额/订单数",
+  "items": [
+    {"id": "q01", "expect_clarify": true, "text": "帮我看看这些数据"},
+    {"id": "q02", "expect_clarify": true, "text": "哪个卖得最好"},
+    {"id": "q03", "expect_clarify": true, "text": "帮我分析一下趋势"},
+    {"id": "q04", "expect_clarify": true, "text": "找出异常的数据"},
+    {"id": "q05", "expect_clarify": true, "text": "对比一下表现"},
+    {"id": "q06", "expect_clarify": true, "text": "为什么业绩下降了"},
+    {"id": "q07", "expect_clarify": true, "text": "给我出一份分析报告"},
+    {"id": "q08", "expect_clarify": true, "text": "这个月情况怎么样"},
+    {"id": "q09", "expect_clarify": true, "text": "客户质量如何"},
+    {"id": "q10", "expect_clarify": true, "text": "帮我优化一下经营策略"},
+    {"id": "q11", "expect_clarify": true, "text": "数据里有什么问题"},
+    {"id": "q12", "expect_clarify": true, "text": "表现最好的是哪个"},
+
+    {"id": "q13", "expect_clarify": false, "text": "2026年1月的销售额合计是多少"},
+    {"id": "q14", "expect_clarify": false, "text": "按产品名称统计2026年1月的销售额，从高到低排"},
+    {"id": "q15", "expect_clarify": false, "text": "2026年1月到3月，销售额按月的变化趋势"},
+    {"id": "q16", "expect_clarify": false, "text": "各销售渠道的销售额占比"},
+    {"id": "q17", "expect_clarify": false, "text": "产品类别和销售额之间有没有相关性"},
+    {"id": "q18", "expect_clarify": false, "text": "算一下2026年1月的毛利率"},
+    {"id": "q19", "expect_clarify": false, "text": "2026年1月销售额最高的三个产品"},
+    {"id": "q20", "expect_clarify": false, "text": "哪款产品销量最大"},
+    {"id": "q21", "expect_clarify": false, "text": "2026年2月每天的订单数走势"},
+    {"id": "q22", "expect_clarify": false, "text": "各产品类别的利润占比"},
+    {"id": "q23", "expect_clarify": false, "text": "2026年1月和2月的销售额对比"},
+    {"id": "q24", "expect_clarify": false, "text": "2026年1月的客单价是多少"}
+  ]
+}

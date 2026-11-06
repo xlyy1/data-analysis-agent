@@ -1,0 +1,129 @@
+{
+  "summary": {
+    "cases": 11,
+    "repeat": 3,
+    "runs_correct_rate": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "exec_rate": 1.0,
+    "correct_rate": 1.0,
+    "avg_gen_ms": 1494.1,
+    "temperature": 0.0,
+    "flipped_cases": [],
+    "misses": []
+  },
+  "rows": [
+    {
+      "q": "2026年1月的销售额合计是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(\"销售额(元)\") AS \"销售额合计\" FROM \"销售数据\" WHERE \"订单日期\" >= '2026-01-01' AND \"订单日期\" <= '2026-01-31'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈73035.00 实得≈73035.00",
+      "gen_ms": 1787.2,
+      "runs": 3
+    },
+    {
+      "q": "销量最大的产品是哪个",
+      "kind": "top_name",
+      "sql": "SELECT \"产品名称\", SUM(\"销量\") AS \"总销量\" FROM \"销售数据\" GROUP BY \"产品名称\" ORDER BY \"总销量\" DESC LIMIT 1",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望包含「充电宝」实得「充电宝」",
+      "gen_ms": 1231.3,
+      "runs": 3
+    },
+    {
+      "q": "整体毛利率是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND((SUM(\"销售额(元)\") - SUM(\"成本(元)\")) * 100.0 / NULLIF(SUM(\"销售额(元)\"), 0), 2) AS \"整体毛利率(%)\" FROM \"销售数据\"",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈27.72 实得≈27.72",
+      "gen_ms": 1477.4,
+      "runs": 3
+    },
+    {
+      "q": "成本最高的三个产品",
+      "kind": "top3_names",
+      "sql": "SELECT \"产品名称\", SUM(\"成本(元)\") AS \"总成本\" FROM \"销售数据\" GROUP BY \"产品名称\" ORDER BY \"总成本\" DESC LIMIT 3",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望前三['运动耳机', '充电宝', '智能手表'] 实得['运动耳机', '充电宝', '智能手表']",
+      "gen_ms": 1233.7,
+      "runs": 3
+    },
+    {
+      "q": "平均单价是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(AVG(\"单价(元)\"), 2) AS \"平均单价(元)\" FROM \"销售数据\"",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈243.12 实得≈243.12",
+      "gen_ms": 1532.5,
+      "runs": 3
+    },
+    {
+      "q": "订单数一共多少",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(DISTINCT \"订单ID\") AS \"订单总数\" FROM \"销售数据\"",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈50.00 实得≈50.00",
+      "gen_ms": 1663.7,
+      "runs": 3
+    },
+    {
+      "q": "利润最低的产品是哪个",
+      "kind": "top_name",
+      "sql": "SELECT \"产品名称\", SUM(\"利润(元)\") AS \"总利润\" FROM \"销售数据\" GROUP BY \"产品名称\" ORDER BY \"总利润\" ASC LIMIT 1",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望包含「充电宝」实得「充电宝」",
+      "gen_ms": 1257.4,
+      "runs": 3
+    },
+    {
+      "q": "总利润是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(\"利润(元)\") AS \"总利润\" FROM \"销售数据\"",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈108938.00 实得≈108938.00",
+      "gen_ms": 1340.2,
+      "runs": 3
+    },
+    {
+      "q": "淘宝渠道的销量总计是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(\"销量\") AS \"淘宝销量总计\" FROM \"销售数据\" WHERE \"销售渠道\" = '淘宝'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈628.00 实得≈628.00",
+      "gen_ms": 1260.2,
+      "runs": 3
+    },
+    {
+      "q": "各销售渠道的销售额占比",
+      "kind": "row_count",
+      "sql": "SELECT \"销售渠道\", SUM(\"销售额(元)\") AS \"渠道销售额\", ROUND(SUM(\"销售额(元)\") * 100.0 / NULLIF((SELECT SUM(\"销售额(元)\") FROM 销售数据), 0), 2) AS \"销售额占比(%)\" FROM 销售数据 GROUP BY \"销售渠道\" ORDER BY \"渠道销售额\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望4行 实得4行",
+      "gen_ms": 1396.0,
+      "runs": 3
+    },
+    {
+      "q": "2026年1月和2月的销售额分别是多少",
+      "kind": "row_count",
+      "sql": "SELECT strftime('%Y-%m', \"订单日期\") AS \"月份\", SUM(\"销售额(元)\") AS \"销售额\" FROM \"销售数据\" WHERE \"订单日期\" >= '2026-01-01' AND \"订单日期\" <= '2026-02-28' GROUP BY \"月份\" ORDER BY \"月份\"",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望2行 实得2行",
+      "gen_ms": 2255.9,
+      "runs": 3
+    }
+  ]
+}

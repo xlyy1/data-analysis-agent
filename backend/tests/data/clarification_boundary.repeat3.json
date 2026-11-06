@@ -1,0 +1,263 @@
+{
+  "summary": {
+    "dataset": "clarification_boundary",
+    "repeat": 3,
+    "temperature": 0.0,
+    "runs_accuracy": [
+      0.95,
+      0.95,
+      0.95
+    ],
+    "majority": {
+      "fuzzy_count": 10,
+      "clear_count": 10,
+      "clarify_recall": 1.0,
+      "false_clarify_rate": 0.1,
+      "accuracy": 0.95,
+      "unknown": 0
+    },
+    "flipped_items": []
+  },
+  "rows": [
+    {
+      "id": "b01",
+      "expect_clarify": true,
+      "text": "对比一下各个渠道",
+      "votes": [
+        true,
+        true,
+        true
+      ],
+      "pred": true,
+      "flipped": false
+    },
+    {
+      "id": "b02",
+      "expect_clarify": true,
+      "text": "看看上海的表现",
+      "votes": [
+        true,
+        true,
+        true
+      ],
+      "pred": true,
+      "flipped": false
+    },
+    {
+      "id": "b03",
+      "expect_clarify": true,
+      "text": "帮我算一下增长",
+      "votes": [
+        true,
+        true,
+        true
+      ],
+      "pred": true,
+      "flipped": false
+    },
+    {
+      "id": "b04",
+      "expect_clarify": true,
+      "text": "最近三个月的趋势怎么样",
+      "votes": [
+        true,
+        true,
+        true
+      ],
+      "pred": true,
+      "flipped": false
+    },
+    {
+      "id": "b05",
+      "expect_clarify": true,
+      "text": "上个月的销售额是多少",
+      "votes": [
+        true,
+        true,
+        true
+      ],
+      "pred": true,
+      "flipped": false
+    },
+    {
+      "id": "b06",
+      "expect_clarify": true,
+      "text": "把表现不好的产品找出来",
+      "votes": [
+        true,
+        true,
+        true
+      ],
+      "pred": true,
+      "flipped": false
+    },
+    {
+      "id": "b07",
+      "expect_clarify": true,
+      "text": "按类别算一下平均",
+      "votes": [
+        true,
+        true,
+        true
+      ],
+      "pred": true,
+      "flipped": false
+    },
+    {
+      "id": "b08",
+      "expect_clarify": true,
+      "text": "分析一下淘宝渠道",
+      "votes": [
+        true,
+        true,
+        true
+      ],
+      "pred": true,
+      "flipped": false
+    },
+    {
+      "id": "b09",
+      "expect_clarify": true,
+      "text": "销量为什么波动这么大",
+      "votes": [
+        true,
+        true,
+        true
+      ],
+      "pred": true,
+      "flipped": false
+    },
+    {
+      "id": "b10",
+      "expect_clarify": true,
+      "text": "利润率怎么样",
+      "votes": [
+        true,
+        true,
+        true
+      ],
+      "pred": true,
+      "flipped": false
+    },
+    {
+      "id": "c01",
+      "expect_clarify": false,
+      "text": "销量最大的产品是哪个",
+      "votes": [
+        false,
+        false,
+        false
+      ],
+      "pred": false,
+      "flipped": false
+    },
+    {
+      "id": "c02",
+      "expect_clarify": false,
+      "text": "各渠道销售额占比",
+      "votes": [
+        false,
+        false,
+        false
+      ],
+      "pred": false,
+      "flipped": false
+    },
+    {
+      "id": "c03",
+      "expect_clarify": false,
+      "text": "1月和2月的销售额对比",
+      "votes": [
+        false,
+        false,
+        false
+      ],
+      "pred": false,
+      "flipped": false
+    },
+    {
+      "id": "c04",
+      "expect_clarify": false,
+      "text": "整体毛利率是多少",
+      "votes": [
+        false,
+        false,
+        false
+      ],
+      "pred": false,
+      "flipped": false
+    },
+    {
+      "id": "c05",
+      "expect_clarify": false,
+      "text": "哪个城市订单数最多",
+      "votes": [
+        false,
+        false,
+        false
+      ],
+      "pred": false,
+      "flipped": false
+    },
+    {
+      "id": "c06",
+      "expect_clarify": false,
+      "text": "产品类别和利润有没有关系",
+      "votes": [
+        false,
+        false,
+        false
+      ],
+      "pred": false,
+      "flipped": false
+    },
+    {
+      "id": "c07",
+      "expect_clarify": false,
+      "text": "把每月销售额画成趋势图",
+      "votes": [
+        false,
+        false,
+        false
+      ],
+      "pred": false,
+      "flipped": false
+    },
+    {
+      "id": "c08",
+      "expect_clarify": false,
+      "text": "成本最高的三个产品",
+      "votes": [
+        false,
+        false,
+        false
+      ],
+      "pred": false,
+      "flipped": false
+    },
+    {
+      "id": "c09",
+      "expect_clarify": false,
+      "text": "平均单价是多少",
+      "votes": [
+        false,
+        false,
+        false
+      ],
+      "pred": false,
+      "flipped": false
+    },
+    {
+      "id": "c10",
+      "expect_clarify": false,
+      "text": "淘宝和京东的销量差多少",
+      "votes": [
+        true,
+        true,
+        true
+      ],
+      "pred": true,
+      "flipped": false
+    }
+  ]
+}
