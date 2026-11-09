@@ -140,6 +140,14 @@ async def generate_query(state: AgentState) -> AgentState:
     prompt = SQL_GEN_PROMPT.format(schema=schemas, question=user_input, intent=intent)
     full_prompt = today_context() + "\n\n" + prompt
 
+    previous_error = state.get("sql_error") or ""
+    if previous_error and state.get("sql_retry_count", 0) > 0:
+        full_prompt += (
+            "\n\n## 上一次 SQL 执行失败（必须修正）\n"
+            f"{previous_error}\n"
+            "上面的 SQL 已经执行报错。请检查列名、表名、聚合写法与方言差异，重新生成一条可执行的 SQL。\n"
+        )
+
     try:
         resp = await llm.chat([
             {"role": "system", "content": full_prompt},
@@ -157,6 +165,8 @@ async def generate_query(state: AgentState) -> AgentState:
             "generated_sql": sql,
             "sql_explanation": result.get("explanation", ""),
             "sql_needs_confirmation": not is_select,
+            "error": "",
+            "empty_result": False,
         }
     except Exception as e:
         return {**state, "error": f"SQL generation failed: {e}"}
