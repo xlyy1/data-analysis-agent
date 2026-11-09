@@ -43,6 +43,19 @@ class AgentState(TypedDict):
     # SQL 是否需要用户确认 (写操作)
     sql_needs_confirmation: bool
 
+    # SQL 执行失败后的重试计数与上一次的错误信息
+    sql_retry_count: int
+    sql_error: str
+
+    # 查询返回 0 行（合法但需要明确告知，避免编造结论）
+    empty_result: bool
+
+    # 结果确定性校验的告警（数值域 / 对账）
+    result_warnings: list[dict]
+
+    # 本次取数各数据源的成败（用于降级与提示）
+    datasource_status: list[dict]
+
     # 查询结果 (JSON 序列化)
     query_result_json: str
 

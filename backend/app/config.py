@@ -35,6 +35,14 @@ class Settings(BaseSettings):
     max_query_rows: int = 100_000
     max_return_rows: int = 10_000
 
+    # --- SQL 失败重试 ---
+    max_sql_retries: int = 1
+
+    # --- 取数超时与并行 ---
+    query_timeout_seconds: float = 10.0
+    query_retries: int = 1
+    parallel_datasources: bool = True
+
     # --- 邮件 ---
     smtp_host: str = ""
     smtp_port: int = 587
