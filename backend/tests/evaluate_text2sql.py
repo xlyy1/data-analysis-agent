@@ -2,6 +2,8 @@
 
 在 D:\\data-agent 下运行：
     python backend/tests/evaluate_text2sql.py --repeat 1 --temperature 0
+
+参考值全部用 pandas 直接从源数据算出，不经过模型。
 """
 from __future__ import annotations
 
@@ -16,23 +18,69 @@ from pathlib import Path
 HERE = Path(__file__).resolve()
 BACKEND = HERE.parents[1]
 XLSX = Path(r"D:\data-agent\_app_data_所有对话_主对话_销售数据 (1).xlsx")
-FALLBACK_DIR = Path(r"C:\Users\dly20\Documents\deepseek-harness\default-workspace\resume-rebuild\results")
+FALLBACK_DIR = BACKEND / "tests" / "data"
 
 sys.path.insert(0, str(BACKEND))
 
-# (问题, 检查类型, 参考值说明)
+# (问题, 检查类型)
 CASES = [
-    ("2026年1月的销售额合计是多少", "scalar"),
-    ("销量最大的产品是哪个", "top_name"),
-    ("整体毛利率是多少", "scalar"),
-    ("成本最高的三个产品", "top3_names"),
-    ("平均单价是多少", "scalar"),
-    ("订单数一共多少", "scalar"),
-    ("利润最低的产品是哪个", "top_name"),
+    # --- 基础汇总 ---
+    ("总销售额是多少", "scalar"),
+    ("总销量是多少", "scalar"),
     ("总利润是多少", "scalar"),
-    ("淘宝渠道的销量总计是多少", "scalar"),
-    ("各销售渠道的销售额占比", "row_count"),
+    ("总成本是多少", "scalar"),
+    ("订单数一共多少", "scalar"),
+    ("平均订单金额是多少", "scalar"),
+    ("平均单价是多少", "scalar"),
+    ("整体毛利率是多少", "scalar"),
+    ("整体利润率是多少", "scalar"),
+    ("有多少笔订单是亏损的", "scalar"),
+    # --- 时间维度 ---
+    ("2026年1月的销售额合计是多少", "scalar"),
+    ("2026年1月的销量是多少", "scalar"),
+    ("2026年1月有多少笔订单", "scalar"),
+    ("2026年3月的利润是多少", "scalar"),
+    ("2026年5月的销售额是多少", "scalar"),
+    ("每个月分别卖了多少钱", "row_count"),
     ("2026年1月和2月的销售额分别是多少", "row_count"),
+    ("2026年4月的毛利率是多少", "scalar"),
+    ("2026年2月淘宝的销售额是多少", "scalar"),
+    ("数据覆盖了哪几个月的销售", "row_count"),
+    # --- 维度分组 ---
+    ("各销售渠道的销售额是多少", "row_count"),
+    ("各产品类别的销量是多少", "row_count"),
+    ("各城市的订单数是多少", "row_count"),
+    ("每个产品的销售额分别是多少", "row_count"),
+    ("销售额最高的渠道是哪个", "top_name"),
+    ("销量最低的渠道是哪个", "top_name"),
+    ("一共有几个销售渠道", "scalar"),
+    ("一共几个产品类别", "scalar"),
+    # --- TopN ---
+    ("销量最大的产品是哪个", "top_name"),
+    ("利润最高的产品是哪个", "top_name"),
+    ("成本最高的三个产品", "top3_names"),
+    ("销售额最低的产品是哪个", "top_name"),
+    ("单价最高的产品是哪个", "top_name"),
+    ("销量前三的产品", "top3_names"),
+    ("销售额前三的产品", "top3_names"),
+    ("利润最低的产品是哪个", "top_name"),
+    # --- 比率 ---
+    ("淘宝渠道的毛利率是多少", "scalar"),
+    ("京东渠道的毛利率是多少", "scalar"),
+    ("手机配件类别的毛利率是多少", "scalar"),
+    ("音频设备类别的毛利率是多少", "scalar"),
+    ("淘宝渠道销售额占总销售额的比例是多少", "scalar"),
+    # --- 组合条件 ---
+    ("2026年1月淘宝的销售额是多少", "scalar"),
+    ("2026年1月京东的销量是多少", "scalar"),
+    ("上海的订单数是多少", "scalar"),
+    ("重庆的销售额是多少", "scalar"),
+    ("手机配件的总销量是多少", "scalar"),
+    ("充电宝的总销量是多少", "scalar"),
+    ("淘宝渠道的总利润是多少", "scalar"),
+    # --- 边界 ---
+    ("2026年12月的销售额是多少", "scalar_or_empty"),
+    ("哪个产品类别的利润率最低", "top_name"),
 ]
 
 
@@ -43,32 +91,100 @@ def build_reference(df):
     d = df.copy()
     d["订单日期"] = pd.to_datetime(d["订单日期"])
     d["月"] = d["订单日期"].dt.month
+    sales, profit, cost = d["销售额(元)"], d["利润(元)"], d["成本(元)"]
+
+    def margin(sub) -> float:
+        return float(sub["利润(元)"].sum() / sub["销售额(元)"].sum() * 100)
 
     ref = {}
+    ref["总销售额是多少"] = ("scalar", float(sales.sum()))
+    ref["总销量是多少"] = ("scalar", float(d["销量"].sum()))
+    ref["总利润是多少"] = ("scalar", float(profit.sum()))
+    ref["总成本是多少"] = ("scalar", float(cost.sum()))
+    ref["订单数一共多少"] = ("scalar", float(len(d)))
+    ref["平均订单金额是多少"] = ("scalar", float(sales.mean()))
+    ref["平均单价是多少"] = ("scalar", float(d["单价(元)"].mean()))
+    ref["整体毛利率是多少"] = ("scalar", margin(d))
+    ref["整体利润率是多少"] = ("scalar", margin(d))
+    ref["有多少笔订单是亏损的"] = ("scalar", float((profit < 0).sum()))
+
     ref["2026年1月的销售额合计是多少"] = ("scalar", float(d[d["月"] == 1]["销售额(元)"].sum()))
-    ref["销量最大的产品是哪个"] = (
-        "top_name", d.groupby("产品名称")["销量"].sum().idxmax())
-    ref["整体毛利率是多少"] = (
-        "scalar", float(d["利润(元)"].sum() / d["销售额(元)"].sum() * 100))
+    ref["2026年1月的销量是多少"] = ("scalar", float(d[d["月"] == 1]["销量"].sum()))
+    ref["2026年1月有多少笔订单"] = ("scalar", float((d["月"] == 1).sum()))
+    ref["2026年3月的利润是多少"] = ("scalar", float(d[d["月"] == 3]["利润(元)"].sum()))
+    ref["2026年5月的销售额是多少"] = ("scalar", float(d[d["月"] == 5]["销售额(元)"].sum()))
+    ref["每个月分别卖了多少钱"] = ("row_count", float(d["月"].nunique()))
+    ref["2026年1月和2月的销售额分别是多少"] = ("row_count", 2.0)
+    ref["2026年4月的毛利率是多少"] = ("scalar", margin(d[d["月"] == 4]))
+    ref["2026年2月淘宝的销售额是多少"] = (
+        "scalar", float(d[(d["月"] == 2) & (d["销售渠道"] == "淘宝")]["销售额(元)"].sum()))
+    ref["数据覆盖了哪几个月的销售"] = ("row_count", float(d["月"].nunique()))
+
+    ref["各销售渠道的销售额是多少"] = ("row_count", float(d["销售渠道"].nunique()))
+    ref["各产品类别的销量是多少"] = ("row_count", float(d["产品类别"].nunique()))
+    ref["各城市的订单数是多少"] = ("row_count", float(d["客户城市"].nunique()))
+    ref["每个产品的销售额分别是多少"] = ("row_count", float(d["产品名称"].nunique()))
+    ref["销售额最高的渠道是哪个"] = (
+        "top_name", d.groupby("销售渠道")["销售额(元)"].sum().idxmax())
+    ref["销量最低的渠道是哪个"] = (
+        "top_name", d.groupby("销售渠道")["销量"].sum().idxmin())
+    ref["一共有几个销售渠道"] = ("scalar", float(d["销售渠道"].nunique()))
+    ref["一共几个产品类别"] = ("scalar", float(d["产品类别"].nunique()))
+
+    ref["销量最大的产品是哪个"] = ("top_name", d.groupby("产品名称")["销量"].sum().idxmax())
+    ref["利润最高的产品是哪个"] = ("top_name", d.groupby("产品名称")["利润(元)"].sum().idxmax())
     ref["成本最高的三个产品"] = (
         "top3_names", list(d.groupby("产品名称")["成本(元)"].sum().nlargest(3).index))
-    ref["平均单价是多少"] = ("scalar", float(d["单价(元)"].mean()))
-    ref["订单数一共多少"] = ("scalar", float(len(d)))
-    ref["利润最低的产品是哪个"] = (
-        "top_name", d.groupby("产品名称")["利润(元)"].sum().idxmin())
-    ref["总利润是多少"] = ("scalar", float(d["利润(元)"].sum()))
-    ref["淘宝渠道的销量总计是多少"] = (
-        "scalar", float(d[d["销售渠道"] == "淘宝"]["销量"].sum()))
-    ref["各销售渠道的销售额占比"] = (
-        "row_count", float(d["销售渠道"].nunique()))
-    ref["2026年1月和2月的销售额分别是多少"] = ("row_count", 2.0)
+    ref["销售额最低的产品是哪个"] = (
+        "top_name", d.groupby("产品名称")["销售额(元)"].sum().idxmin())
+    ref["单价最高的产品是哪个"] = ("top_name", d.loc[d["单价(元)"].idxmax(), "产品名称"])
+    ref["销量前三的产品"] = (
+        "top3_names", list(d.groupby("产品名称")["销量"].sum().nlargest(3).index))
+    ref["销售额前三的产品"] = (
+        "top3_names", list(d.groupby("产品名称")["销售额(元)"].sum().nlargest(3).index))
+    ref["利润最低的产品是哪个"] = ("top_name", d.groupby("产品名称")["利润(元)"].sum().idxmin())
+
+    ref["淘宝渠道的毛利率是多少"] = ("scalar", margin(d[d["销售渠道"] == "淘宝"]))
+    ref["京东渠道的毛利率是多少"] = ("scalar", margin(d[d["销售渠道"] == "京东"]))
+    ref["手机配件类别的毛利率是多少"] = ("scalar", margin(d[d["产品类别"] == "手机配件"]))
+    ref["音频设备类别的毛利率是多少"] = ("scalar", margin(d[d["产品类别"] == "音频设备"]))
+    ref["淘宝渠道销售额占总销售额的比例是多少"] = (
+        "scalar", float(d[d["销售渠道"] == "淘宝"]["销售额(元)"].sum() / sales.sum() * 100))
+
+    ref["2026年1月淘宝的销售额是多少"] = (
+        "scalar", float(d[(d["月"] == 1) & (d["销售渠道"] == "淘宝")]["销售额(元)"].sum()))
+    ref["2026年1月京东的销量是多少"] = (
+        "scalar", float(d[(d["月"] == 1) & (d["销售渠道"] == "京东")]["销量"].sum()))
+    ref["上海的订单数是多少"] = ("scalar", float((d["客户城市"] == "上海").sum()))
+    ref["重庆的销售额是多少"] = ("scalar", float(d[d["客户城市"] == "重庆"]["销售额(元)"].sum()))
+    ref["手机配件的总销量是多少"] = ("scalar", float(d[d["产品类别"] == "手机配件"]["销量"].sum()))
+    ref["充电宝的总销量是多少"] = ("scalar", float(d[d["产品名称"] == "充电宝"]["销量"].sum()))
+    ref["淘宝渠道的总利润是多少"] = ("scalar", float(d[d["销售渠道"] == "淘宝"]["利润(元)"].sum()))
+
+    ref["2026年12月的销售额是多少"] = ("scalar", 0.0)
+    ref["哪个产品类别的利润率最低"] = (
+        "top_name",
+        (d.groupby("产品类别").apply(lambda s: s["利润(元)"].sum() / s["销售额(元)"].sum()))
+        .idxmin(),
+    )
     return ref
 
 
 def check(kind, expected, columns, rows):
     """返回 (是否通过, 说明)"""
+    if kind == "scalar_or_empty":
+        if not rows:
+            return True, "无结果行，视为无数据"
+        has_number = any(
+            v is not None and not isinstance(v, bool) and str(v).replace(",", "").strip("%").replace("-", "").replace(".", "").isdigit()
+            for row in rows for v in row
+        )
+        if not has_number:
+            return True, "结果为 NULL，视为无数据"
+        kind = "scalar"
     if not rows:
         return False, "无结果行"
+
     flat = [r for row in rows for r in row]
     if kind == "scalar":
         nums = []
@@ -152,6 +268,8 @@ async def main() -> int:
                 err = out.get("error", "未生成 SQL")
 
             ok, detail = (False, err) if not ok_exec else check(kind, ref[q][1], cols, rows)
+            if kind == "scalar_or_empty" and not ok_exec and "结果为空" in err:
+                ok, detail = True, "无结果行，视为无数据"
             per_case[q].append((ok_exec, ok, detail, sql, gen_ms))
             run_hits += ok
             if args.verbose:
