@@ -195,6 +195,74 @@ def build_reference(df):
     return ref
 
 
+METRIC_COLUMNS = {
+    "销售额": "销售额(元)",
+    "销量": "销量",
+    "利润": "利润(元)",
+    "成本": "成本(元)",
+}
+
+
+def expand_cases(df, ref):
+    """按 维度 × 指标 组合生成用例，参考值用 pandas 直接算。"""
+    import pandas as pd
+
+    d = df.copy()
+    d["订单日期"] = pd.to_datetime(d["订单日期"])
+    d["月"] = d["订单日期"].dt.month
+    generated = []
+
+    def add(question, kind, expected):
+        if question in ref:
+            return
+        ref[question] = (kind, expected)
+        generated.append((question, kind))
+
+    # 维度 × 指标（求和）
+    for dim in ("销售渠道", "产品类别", "产品名称"):
+        for value in sorted(d[dim].dropna().unique()):
+            subset = d[d[dim] == value]
+            if subset.empty:
+                continue
+            for label, column in METRIC_COLUMNS.items():
+                add(f"{value}的{label}是多少", "scalar",
+                    float(subset[column].sum()))
+
+    # 月份 × 指标
+    for month in sorted(d["月"].unique()):
+        subset = d[d["月"] == month]
+        for label, column in METRIC_COLUMNS.items():
+            add(f"2026年{int(month)}月的{label}是多少", "scalar",
+                float(subset[column].sum()))
+
+    # 城市 × 两个指标
+    for city in sorted(d["客户城市"].dropna().unique()):
+        subset = d[d["客户城市"] == city]
+        add(f"{city}的销售额是多少", "scalar", float(subset["销售额(元)"].sum()))
+        add(f"{city}的订单数是多少", "scalar", float(len(subset)))
+
+    # 维度 × 月份（双条件，明显更难）
+    for dim in ("销售渠道", "产品类别"):
+        for value in sorted(d[dim].dropna().unique()):
+            for month in sorted(d["月"].unique()):
+                subset = d[(d[dim] == value) & (d["月"] == month)]
+                if subset.empty:
+                    continue
+                add(f"2026年{int(month)}月{value}的销售额是多少", "scalar",
+                    float(subset["销售额(元)"].sum()))
+
+    # 维度利润率
+    for dim in ("销售渠道", "产品类别"):
+        for value in sorted(d[dim].dropna().unique()):
+            subset = d[d[dim] == value]
+            if subset.empty or not subset["销售额(元)"].sum():
+                continue
+            add(f"{value}的利润率是多少", "scalar",
+                float(subset["利润(元)"].sum() / subset["销售额(元)"].sum() * 100))
+
+    return generated
+
+
 def check(kind, expected, columns, rows):
     """返回 (是否通过, 说明)"""
     if kind == "scalar_or_empty":
@@ -267,14 +335,17 @@ async def main() -> int:
     schema_text = json.dumps(schema, ensure_ascii=False)
 
     import pandas as pd
-    ref = build_reference(pd.read_excel(XLSX, sheet_name=0))
+    raw = pd.read_excel(XLSX, sheet_name=0)
+    ref = build_reference(raw)
+    extra = expand_cases(raw, ref)
+    all_cases = CASES + extra
 
     rows_out = []
-    per_case = {q: [] for q, _ in CASES}
+    per_case = {q: [] for q, _ in all_cases}
     run_rate = []
     for run_idx in range(args.repeat):
         run_hits = 0
-        for q, kind in CASES:
+        for q, kind in all_cases:
             state = {"user_input": q, "datasource_schemas": [schema_text], "intent": "{}"}
             t0 = time.perf_counter()
             out = await generate_query(state)
@@ -299,12 +370,12 @@ async def main() -> int:
             run_hits += ok
             if args.verbose:
                 print(f'[run {run_idx + 1}][{"OK " if ok else "MISS"}] {q} | {detail}')
-        run_rate.append(round(run_hits / len(CASES), 4))
+        run_rate.append(round(run_hits / len(all_cases), 4))
 
     await ds.disconnect()
 
     flips = []
-    for q, kind in CASES:
+    for q, kind in all_cases:
         results = per_case[q]
         n_ok = sum(1 for _, ok, *_ in results if ok)
         majority_ok = n_ok * 2 > len(results)
