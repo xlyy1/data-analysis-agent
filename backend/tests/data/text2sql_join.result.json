@@ -1,0 +1,425 @@
+{
+  "summary": {
+    "dataset": "warehouse.db",
+    "rows": 50000,
+    "tables": 4,
+    "cases": 41,
+    "correct_rate": 1.0,
+    "exec_rate": 1.0,
+    "avg_gen_ms": 2064.9,
+    "avg_exec_ms": 232.8,
+    "misses": []
+  },
+  "rows": [
+    {
+      "q": "各产品类别的销售额是多少",
+      "kind": "row_count",
+      "sql": "SELECT p.\"产品类别\", ROUND(SUM(o.\"金额\"), 2) AS \"销售额\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" GROUP BY p.\"产品类别\" ORDER BY \"销售额\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望4行 实得4行",
+      "gen_ms": 4674.8,
+      "exec_ms": 60.3
+    },
+    {
+      "q": "各城市的订单数是多少",
+      "kind": "row_count",
+      "sql": "SELECT c.\"城市\", COUNT(o.\"订单ID\") AS \"订单数\" FROM orders o JOIN customers c ON o.\"客户ID\" = c.\"客户ID\" GROUP BY c.\"城市\" ORDER BY \"订单数\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望10行 实得10行",
+      "gen_ms": 1918.9,
+      "exec_ms": 82.4
+    },
+    {
+      "q": "各客户等级的消费金额是多少",
+      "kind": "row_count",
+      "sql": "SELECT c.\"等级\", ROUND(SUM(o.\"金额\"), 2) AS \"消费金额\" FROM orders o JOIN customers c ON o.\"客户ID\" = c.\"客户ID\" GROUP BY c.\"等级\" ORDER BY \"消费金额\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望3行 实得3行",
+      "gen_ms": 1630.6,
+      "exec_ms": 85.2
+    },
+    {
+      "q": "销售额最高的产品类别是哪个",
+      "kind": "top_name",
+      "sql": "SELECT p.\"产品类别\", ROUND(SUM(o.\"金额\"), 2) AS \"销售额\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" GROUP BY p.\"产品类别\" ORDER BY \"销售额\" DESC LIMIT 1",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望包含「手机配件」实得['手机配件', '54467505.0']",
+      "gen_ms": 2043.1,
+      "exec_ms": 51.7
+    },
+    {
+      "q": "订单数最少的城市是哪个",
+      "kind": "top_name",
+      "sql": "SELECT c.\"城市\", COUNT(o.\"订单ID\") AS \"订单数\" FROM orders o JOIN customers c ON o.\"客户ID\" = c.\"客户ID\" GROUP BY c.\"城市\" ORDER BY \"订单数\" ASC LIMIT 1",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望包含「苏州」实得['苏州', '3781']",
+      "gen_ms": 1884.2,
+      "exec_ms": 83.2
+    },
+    {
+      "q": "黄金客户的消费金额是多少",
+      "kind": "scalar",
+      "sql": "SELECT c.\"等级\", ROUND(SUM(o.\"金额\"), 2) AS \"消费金额\" FROM orders o JOIN customers c ON o.\"客户ID\" = c.\"客户ID\" WHERE c.\"等级\" = '黄金' GROUP BY c.\"等级\"",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈12119455.00 实得≈12119455.00",
+      "gen_ms": 1974.2,
+      "exec_ms": 10.4
+    },
+    {
+      "q": "上海客户的订单数是多少",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"订单数\" FROM orders o JOIN customers c ON o.\"客户ID\" = c.\"客户ID\" WHERE c.\"城市\" = '上海'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈4540.00 实得≈4540.00",
+      "gen_ms": 1723.8,
+      "exec_ms": 0.9
+    },
+    {
+      "q": "音频设备类别的销量是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(o.\"数量\") AS \"音频设备销量\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" WHERE p.\"产品类别\" = '音频设备'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈63950.00 实得≈63950.00",
+      "gen_ms": 1898.8,
+      "exec_ms": 9.9
+    },
+    {
+      "q": "各供应商的销售额是多少",
+      "kind": "row_count",
+      "sql": "SELECT s.\"供应商名称\", ROUND(SUM(o.\"金额\"), 2) AS \"销售额\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" JOIN suppliers s ON p.\"供应商ID\" = s.\"供应商ID\" GROUP BY s.\"供应商名称\" ORDER BY \"销售额\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望6行 实得6行",
+      "gen_ms": 2008.8,
+      "exec_ms": 61.0
+    },
+    {
+      "q": "各供应商的订单数是多少",
+      "kind": "row_count",
+      "sql": "SELECT s.\"供应商名称\", COUNT(o.\"订单ID\") AS \"订单数\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" JOIN suppliers s ON p.\"供应商ID\" = s.\"供应商ID\" GROUP BY s.\"供应商名称\" ORDER BY \"订单数\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望6行 实得6行",
+      "gen_ms": 1897.4,
+      "exec_ms": 58.2
+    },
+    {
+      "q": "销售额最高的供应商是哪个",
+      "kind": "top_name",
+      "sql": "SELECT s.\"供应商名称\", ROUND(SUM(o.\"金额\"), 2) AS \"销售额\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" JOIN suppliers s ON p.\"供应商ID\" = s.\"供应商ID\" GROUP BY s.\"供应商名称\" ORDER BY \"销售额\" DESC LIMIT 1",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望包含「华北科技」实得['华北科技', '60223260.0']",
+      "gen_ms": 2237.9,
+      "exec_ms": 57.5
+    },
+    {
+      "q": "华东地区供应商的销售额是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(o.\"金额\"), 2) AS \"销售额\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" JOIN suppliers s ON p.\"供应商ID\" = s.\"供应商ID\" WHERE s.\"所在地区\" = '华东'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈24929012.00 实得≈24929012.00",
+      "gen_ms": 2281.6,
+      "exec_ms": 11.2
+    },
+    {
+      "q": "海外供应商的订单数是多少",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"订单数\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" JOIN suppliers s ON p.\"供应商ID\" = s.\"供应商ID\" WHERE s.\"所在地区\" = '海外'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈11487.00 实得≈11487.00",
+      "gen_ms": 1749.7,
+      "exec_ms": 1.1
+    },
+    {
+      "q": "各城市的黄金客户贡献了多少销售额",
+      "kind": "row_count",
+      "sql": "SELECT c.\"城市\", ROUND(SUM(o.\"金额\"), 2) AS \"销售额\" FROM orders o JOIN customers c ON o.\"客户ID\" = c.\"客户ID\" WHERE c.\"等级\" = '黄金' GROUP BY c.\"城市\" ORDER BY \"销售额\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望10行 实得10行",
+      "gen_ms": 2156.5,
+      "exec_ms": 11.1
+    },
+    {
+      "q": "华东供应商卖到上海客户的金额是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(o.\"金额\") AS \"总金额\" FROM orders o JOIN customers c ON o.\"客户ID\" = c.\"客户ID\" JOIN products p ON o.\"产品ID\" = p.\"产品ID\" JOIN suppliers s ON p.\"供应商ID\" = s.\"供应商ID\" WHERE s.\"所在地区\" = '华东' AND c.\"城市\" = '上海'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈2219366.00 实得≈2219366.00",
+      "gen_ms": 1775.4,
+      "exec_ms": 11.7
+    },
+    {
+      "q": "华南地区供应商在音频设备上的销售额是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(o.\"金额\"), 2) AS \"销售额\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" JOIN suppliers s ON p.\"供应商ID\" = s.\"供应商ID\" WHERE s.\"所在地区\" = '华南' AND p.\"产品类别\" = '音频设备'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "结果为 NULL，与期望 0 一致",
+      "gen_ms": 1863.9,
+      "exec_ms": 2.4
+    },
+    {
+      "q": "金额高于平均订单金额的订单有多少笔",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"订单笔数\" FROM orders WHERE \"金额\" > (SELECT AVG(\"金额\") FROM orders)",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈17995.00 实得≈17995.00",
+      "gen_ms": 2117.2,
+      "exec_ms": 9.8
+    },
+    {
+      "q": "利润最高的那笔订单来自哪个城市",
+      "kind": "top_name",
+      "sql": "SELECT o.\"订单ID\", o.\"利润\", c.\"城市\" FROM orders o JOIN customers c ON o.\"客户ID\" = c.\"客户ID\" ORDER BY o.\"利润\" DESC LIMIT 1",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望包含「北京」实得['47115', '5015.7', '北京']",
+      "gen_ms": 1872.0,
+      "exec_ms": 77.6
+    },
+    {
+      "q": "消费金额最高的客户来自哪个城市",
+      "kind": "top_name",
+      "sql": "SELECT c.\"客户名称\", c.\"城市\", SUM(o.\"金额\") AS \"总消费金额\" FROM orders o JOIN customers c ON o.\"客户ID\" = c.\"客户ID\" GROUP BY c.\"客户ID\", c.\"客户名称\", c.\"城市\" ORDER BY \"总消费金额\" DESC LIMIT 1",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望包含「杭州」实得['客户0159', '杭州', '346966.0']",
+      "gen_ms": 2597.3,
+      "exec_ms": 98.0
+    },
+    {
+      "q": "订单金额高于该客户平均订单金额的订单数是多少",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"订单数\" FROM orders o WHERE o.\"金额\" > (SELECT AVG(o2.\"金额\") FROM orders o2 WHERE o2.\"客户ID\" = o.\"客户ID\")",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈17696.00 实得≈17696.00",
+      "gen_ms": 2151.6,
+      "exec_ms": 8157.3
+    },
+    {
+      "q": "买过音频设备的客户数是多少",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(DISTINCT o.\"客户ID\") AS \"客户数\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" WHERE p.\"产品类别\" = '音频设备'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈500.00 实得≈500.00",
+      "gen_ms": 2284.4,
+      "exec_ms": 12.0
+    },
+    {
+      "q": "从未下过订单的客户数是多少",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"未下单客户数\" FROM customers c WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.\"客户ID\" = c.\"客户ID\")",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈0.00 实得≈0.00",
+      "gen_ms": 2036.5,
+      "exec_ms": 1.6
+    },
+    {
+      "q": "没有卖出去过的产品数是多少",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"未售出产品数\" FROM products WHERE \"产品ID\" NOT IN (SELECT DISTINCT \"产品ID\" FROM orders WHERE \"产品ID\" IS NOT NULL)",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈0.00 实得≈0.00",
+      "gen_ms": 1904.9,
+      "exec_ms": 3.6
+    },
+    {
+      "q": "买过充电宝的客户有多少",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(DISTINCT o.\"客户ID\") AS \"购买充电宝客户数\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" WHERE p.\"产品名称\" = '充电宝'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈500.00 实得≈500.00",
+      "gen_ms": 2002.6,
+      "exec_ms": 5.4
+    },
+    {
+      "q": "供货的产品全部卖出去过的供应商有几家",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"供应商家数\" FROM (SELECT s.\"供应商ID\" FROM suppliers s JOIN products p ON p.\"供应商ID\" = s.\"供应商ID\" WHERE NOT EXISTS (SELECT 1 FROM products p2 WHERE p2.\"供应商ID\" = s.\"供应商ID\" AND NOT EXISTS (SELECT 1 FROM orders o WHERE o.\"产品ID\" = p2.\"产品ID\")) GROUP BY s.\"供应商ID\") t",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈6.00 实得≈6.00",
+      "gen_ms": 2334.4,
+      "exec_ms": 0.7
+    },
+    {
+      "q": "订单数超过100笔的客户有多少",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"客户数\" FROM (SELECT \"客户ID\", COUNT(*) AS \"订单数\" FROM orders GROUP BY \"客户ID\" HAVING COUNT(*) > 100) t",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈231.00 实得≈231.00",
+      "gen_ms": 1647.7,
+      "exec_ms": 3.7
+    },
+    {
+      "q": "消费金额超过5万元的客户有多少",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"客户数\" FROM (SELECT o.\"客户ID\", SUM(o.\"金额\") AS \"消费总额\" FROM orders o GROUP BY o.\"客户ID\" HAVING SUM(o.\"金额\") > 50000) t",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈500.00 实得≈500.00",
+      "gen_ms": 1774.8,
+      "exec_ms": 75.6
+    },
+    {
+      "q": "订单数超过2000笔的产品有多少",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"产品数量\" FROM (SELECT p.\"产品名称\", COUNT(*) AS \"订单数\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" GROUP BY p.\"产品名称\" HAVING COUNT(*) > 2000) t",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈13.00 实得≈13.00",
+      "gen_ms": 2412.7,
+      "exec_ms": 10.2
+    },
+    {
+      "q": "销售额超过10万元的类别有多少",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"类别数\" FROM (SELECT p.\"产品类别\", SUM(o.\"金额\") AS \"类别销售额\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" GROUP BY p.\"产品类别\" HAVING SUM(o.\"金额\") > 100000) t",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈4.00 实得≈4.00",
+      "gen_ms": 2085.0,
+      "exec_ms": 49.0
+    },
+    {
+      "q": "2026年3月音频设备的销售额是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(o.\"金额\"), 2) AS \"销售额\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" WHERE p.\"产品类别\" = '音频设备' AND o.\"订单日期\" >= '2026-03-01' AND o.\"订单日期\" <= '2026-03-31'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈1417200.00 实得≈1417200.00",
+      "gen_ms": 2290.0,
+      "exec_ms": 9.9
+    },
+    {
+      "q": "2026年下半年华东供应商的订单数是多少",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(DISTINCT o.\"订单ID\") AS \"订单数\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" JOIN suppliers s ON p.\"供应商ID\" = s.\"供应商ID\" WHERE s.\"所在地区\" = '华东' AND o.\"订单日期\" >= '2026-07-01' AND o.\"订单日期\" <= '2026-12-31'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈6149.00 实得≈6149.00",
+      "gen_ms": 2178.7,
+      "exec_ms": 58.6
+    },
+    {
+      "q": "2026年11月黄金客户的消费金额是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(o.\"金额\") AS \"消费金额\" FROM orders o JOIN customers c ON o.\"客户ID\" = c.\"客户ID\" WHERE c.\"等级\" = '黄金' AND o.\"订单日期\" >= '2026-11-01' AND o.\"订单日期\" <= '2026-11-30'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈1641522.00 实得≈1641522.00",
+      "gen_ms": 1913.2,
+      "exec_ms": 10.8
+    },
+    {
+      "q": "每个月华东供应商的销售额是多少",
+      "kind": "row_count",
+      "sql": "SELECT strftime('%Y-%m', o.\"订单日期\") AS \"月份\", ROUND(SUM(o.\"金额\"), 2) AS \"销售额\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" JOIN suppliers s ON p.\"供应商ID\" = s.\"供应商ID\" WHERE s.\"所在地区\" = '华东' GROUP BY strftime('%Y-%m', o.\"订单日期\") ORDER BY \"月份\" ASC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望12行 实得12行",
+      "gen_ms": 2170.2,
+      "exec_ms": 23.2
+    },
+    {
+      "q": "整体利润率是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(\"利润\") * 100.0 / NULLIF(SUM(\"金额\"), 0), 2) AS \"整体利润率(%)\" FROM orders",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈39.24 实得≈39.24",
+      "gen_ms": 1613.2,
+      "exec_ms": 6.2
+    },
+    {
+      "q": "华东供应商的利润率是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(o.\"利润\") * 100.0 / NULLIF(SUM(o.\"金额\"), 0), 2) AS \"利润率(%)\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" JOIN suppliers s ON p.\"供应商ID\" = s.\"供应商ID\" WHERE s.\"所在地区\" = '华东'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈33.52 实得≈33.52",
+      "gen_ms": 2041.2,
+      "exec_ms": 11.1
+    },
+    {
+      "q": "音频设备占整体销售额的比例是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(CASE WHEN p.\"产品类别\" = '音频设备' THEN o.\"金额\" ELSE 0 END) * 100.0 / NULLIF(SUM(o.\"金额\"), 0), 2) AS \"音频设备销售额占比(%)\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\"",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈18.02 实得≈18.02",
+      "gen_ms": 2217.4,
+      "exec_ms": 43.1
+    },
+    {
+      "q": "黄金客户的消费金额占比是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(CASE WHEN c.\"等级\" = '黄金' THEN o.\"金额\" ELSE 0 END) * 100.0 / NULLIF(SUM(o.\"金额\"), 0), 2) AS \"黄金客户消费金额占比(%)\" FROM orders o JOIN customers c ON o.\"客户ID\" = c.\"客户ID\"",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈9.82 实得≈9.82",
+      "gen_ms": 2267.9,
+      "exec_ms": 78.2
+    },
+    {
+      "q": "销售额前三的供应商",
+      "kind": "top3_names",
+      "sql": "SELECT s.\"供应商名称\", ROUND(SUM(o.\"金额\"), 2) AS \"销售额\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" JOIN suppliers s ON p.\"供应商ID\" = s.\"供应商ID\" GROUP BY s.\"供应商名称\" ORDER BY \"销售额\" DESC LIMIT 3",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望前三['华北科技', '海外进口', '华东智配'] 实得['华北科技', '海外进口', '华东智配']",
+      "gen_ms": 2086.9,
+      "exec_ms": 55.6
+    },
+    {
+      "q": "销售额前三的类别",
+      "kind": "top3_names",
+      "sql": "SELECT p.\"产品类别\", ROUND(SUM(o.\"金额\"), 2) AS \"销售额\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" GROUP BY p.\"产品类别\" ORDER BY \"销售额\" DESC LIMIT 3",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望前三['手机配件', '电脑外设', '音频设备'] 实得['手机配件', '电脑外设', '音频设备']",
+      "gen_ms": 1794.6,
+      "exec_ms": 53.2
+    },
+    {
+      "q": "订单数最多的城市",
+      "kind": "top_name",
+      "sql": "SELECT c.\"城市\", COUNT(*) AS \"订单数\" FROM orders o JOIN customers c ON o.\"客户ID\" = c.\"客户ID\" GROUP BY c.\"城市\" ORDER BY \"订单数\" DESC LIMIT 1",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望包含「北京」实得['北京', '6276']",
+      "gen_ms": 1379.6,
+      "exec_ms": 9.3
+    },
+    {
+      "q": "平均订单金额最高的客户等级是哪个",
+      "kind": "top_name",
+      "sql": "SELECT c.\"等级\", ROUND(AVG(o.\"金额\"), 2) AS \"平均订单金额\", COUNT(*) AS \"订单数\" FROM orders o JOIN customers c ON o.\"客户ID\" = c.\"客户ID\" GROUP BY c.\"等级\" ORDER BY \"平均订单金额\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望包含「普通」实得['普通', '2485.55', '30155']",
+      "gen_ms": 1767.9,
+      "exec_ms": 84.9
+    }
+  ]
+}
