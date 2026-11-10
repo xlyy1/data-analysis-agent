@@ -147,17 +147,9 @@ async def main() -> int:
 
     ds = SQLiteDataSource(db_path=str(DB))
     await ds.connect()
-    tables = await ds.get_tables()
-    schema = {
-        "tables": [
-            {
-                "name": t.name,
-                "row_count": t.row_count,
-                "columns": [{"name": c.name, "dtype": c.dtype} for c in t.columns],
-            }
-            for t in tables
-        ]
-    }
+    from app.services.schema import describe_schema
+
+    schema = await describe_schema(ds)
     schema_text = json.dumps(schema, ensure_ascii=False)
 
     conn = sqlite3.connect(DB)

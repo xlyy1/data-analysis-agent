@@ -43,6 +43,14 @@ GROUP them:
 | "哪个平台销量最高" | Compare across platforms | SUM each platform's "销量" column separately |
 | "单件利率" / "单件利润率" | Per-product profit rate | GROUP BY 产品, SUM("总利润")/SUM("总收入")×100 |
 
+### 过滤值必须与列的样本取值一致
+
+schema 中部分列附带 `sample_values`（该列的真实取值）。
+写 WHERE 条件前先看这一列有没有 sample_values：
+- 有：过滤值必须**取自 sample_values**，不能照抄问句里的说法
+  （例如问"黄金会员"，sample_values 是 ["普通","白银","黄金","钻石"]，应写 `会员等级 = '黄金'`）
+- 没有：保留问句中的值，不要自行加后缀或改写
+
 ### 维度列的选择
 
 - 用户说的是**品类词**（如“手机配件”“音频设备”）→ 过滤条件落在 产品类别 列

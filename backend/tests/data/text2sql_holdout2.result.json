@@ -1,0 +1,235 @@
+{
+  "summary": {
+    "dataset": "holdout_library.db",
+    "holdout": true,
+    "note": "第三套数据，修复 sample_values 后只跑一次",
+    "cases": 22,
+    "correct_rate": 1.0,
+    "exec_rate": 1.0,
+    "avg_gen_ms": 1756.7,
+    "avg_exec_ms": 1.5,
+    "misses": []
+  },
+  "rows": [
+    {
+      "q": "一共有多少条借阅记录",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"借阅记录总数\" FROM loans",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈6000.00 实得≈6000.00",
+      "gen_ms": 4936.3,
+      "exec_ms": 2.4
+    },
+    {
+      "q": "2026年3月有多少条借阅记录",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"借阅记录数\" FROM loans WHERE \"借阅日期\" >= '2026-03-01' AND \"借阅日期\" <= '2026-03-31'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈674.00 实得≈674.00",
+      "gen_ms": 1658.9,
+      "exec_ms": 1.0
+    },
+    {
+      "q": "逾期总天数是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(\"逾期天数\") AS \"逾期总天数\" FROM loans",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈37221.00 实得≈37221.00",
+      "gen_ms": 1191.3,
+      "exec_ms": 1.2
+    },
+    {
+      "q": "逾期记录有多少条",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"逾期记录数\" FROM loans WHERE \"逾期天数\" > 0",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈2702.00 实得≈2702.00",
+      "gen_ms": 1235.1,
+      "exec_ms": 1.0
+    },
+    {
+      "q": "平均逾期天数是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(AVG(\"逾期天数\"), 2) AS \"平均逾期天数\" FROM loans",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈6.20 实得≈6.20",
+      "gen_ms": 1469.2,
+      "exec_ms": 0.9
+    },
+    {
+      "q": "每月分别有多少条借阅记录",
+      "kind": "row_count",
+      "sql": "SELECT substr(\"借阅日期\", 1, 7) AS \"月份\", COUNT(*) AS \"借阅记录数\" FROM loans GROUP BY substr(\"借阅日期\", 1, 7) ORDER BY \"月份\" ASC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望9行 实得9行",
+      "gen_ms": 1921.0,
+      "exec_ms": 2.1
+    },
+    {
+      "q": "各读者类型的借阅记录数是多少",
+      "kind": "row_count",
+      "sql": "SELECT \"读者类型\", COUNT(*) AS \"借阅记录数\" FROM loans GROUP BY \"读者类型\" ORDER BY \"借阅记录数\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望3行 实得3行",
+      "gen_ms": 1374.0,
+      "exec_ms": 1.5
+    },
+    {
+      "q": "各分馆的逾期总天数是多少",
+      "kind": "row_count",
+      "sql": "SELECT \"分馆\", SUM(\"逾期天数\") AS \"逾期总天数\" FROM loans GROUP BY \"分馆\" ORDER BY \"逾期总天数\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望3行 实得3行",
+      "gen_ms": 1627.4,
+      "exec_ms": 2.8
+    },
+    {
+      "q": "各图书类别的借阅次数是多少",
+      "kind": "row_count",
+      "sql": "SELECT b.\"类别\", COUNT(*) AS \"借阅次数\" FROM loans l JOIN books b ON l.\"图书编号\" = b.\"图书编号\" GROUP BY b.\"类别\" ORDER BY \"借阅次数\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望5行 实得5行",
+      "gen_ms": 2025.6,
+      "exec_ms": 1.2
+    },
+    {
+      "q": "借阅次数最多的书是哪个",
+      "kind": "top_name",
+      "sql": "SELECT b.\"书名\", COUNT(*) AS \"借阅次数\" FROM loans l JOIN books b ON l.\"图书编号\" = b.\"图书编号\" GROUP BY b.\"书名\" ORDER BY \"借阅次数\" DESC LIMIT 1",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望包含「万历十五年」实得「万历十五年」",
+      "gen_ms": 1794.6,
+      "exec_ms": 1.8
+    },
+    {
+      "q": "逾期总天数最多的分馆是哪个",
+      "kind": "top_name",
+      "sql": "SELECT \"分馆\", SUM(\"逾期天数\") AS \"逾期总天数\" FROM loans GROUP BY \"分馆\" ORDER BY \"逾期总天数\" DESC LIMIT 1",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望包含「总馆」实得「总馆」",
+      "gen_ms": 1733.3,
+      "exec_ms": 1.9
+    },
+    {
+      "q": "借阅次数最少的类别是哪个",
+      "kind": "top_name",
+      "sql": "SELECT b.\"类别\", COUNT(*) AS \"借阅次数\" FROM loans l JOIN books b ON l.\"图书编号\" = b.\"图书编号\" GROUP BY b.\"类别\" ORDER BY \"借阅次数\" ASC LIMIT 1",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望包含「文学」实得「文学」",
+      "gen_ms": 1557.1,
+      "exec_ms": 1.8
+    },
+    {
+      "q": "教师借阅了多少条记录",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"借阅记录数\" FROM loans WHERE \"读者类型\" = '教师'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈1356.00 实得≈1356.00",
+      "gen_ms": 1363.3,
+      "exec_ms": 1.5
+    },
+    {
+      "q": "校外读者的逾期总天数是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(\"逾期天数\") AS \"逾期总天数\" FROM loans WHERE \"读者类型\" = '校外'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈3280.00 实得≈3280.00",
+      "gen_ms": 1567.8,
+      "exec_ms": 1.5
+    },
+    {
+      "q": "东区分馆的借阅记录数是多少",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"借阅记录数\" FROM loans WHERE \"分馆\" = '东区分馆'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈1529.00 实得≈1529.00",
+      "gen_ms": 949.1,
+      "exec_ms": 1.8
+    },
+    {
+      "q": "计算机类图书的借阅次数是多少",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"借阅次数\" FROM loans l JOIN books b ON l.\"图书编号\" = b.\"图书编号\" WHERE b.\"类别\" = '计算机'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈1809.00 实得≈1809.00",
+      "gen_ms": 1885.9,
+      "exec_ms": 0.5
+    },
+    {
+      "q": "《人类简史》被借阅了多少次",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"借阅次数\" FROM loans l JOIN books b ON l.\"图书编号\" = b.\"图书编号\" WHERE b.\"书名\" = '人类简史'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈572.00 实得≈572.00",
+      "gen_ms": 1680.0,
+      "exec_ms": 0.7
+    },
+    {
+      "q": "2026年5月学生读者的借阅记录数是多少",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"借阅记录数\" FROM loans WHERE \"借阅日期\" >= '2026-05-01' AND \"借阅日期\" <= '2026-05-31' AND \"读者类型\" = '学生'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈441.00 实得≈441.00",
+      "gen_ms": 1359.7,
+      "exec_ms": 0.8
+    },
+    {
+      "q": "各读者类型的逾期率分别是多少",
+      "kind": "row_count",
+      "sql": "SELECT \"读者类型\", COUNT(*) AS \"借阅总数\", SUM(CASE WHEN \"逾期天数\" > 0 THEN 1 ELSE 0 END) AS \"逾期次数\", ROUND(SUM(CASE WHEN \"逾期天数\" > 0 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0), 2) AS \"逾期率(%)\" FROM loans GROUP BY \"读者类型\" ORDER BY \"逾期率(%)\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望3行 实得3行",
+      "gen_ms": 1904.2,
+      "exec_ms": 1.8
+    },
+    {
+      "q": "整体逾期率是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(CASE WHEN \"逾期天数\" > 0 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0), 2) AS \"整体逾期率(%)\" FROM loans",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈45.03 实得≈45.03",
+      "gen_ms": 1967.0,
+      "exec_ms": 0.9
+    },
+    {
+      "q": "借阅次数前三的书",
+      "kind": "top3_names",
+      "sql": "SELECT b.\"书名\", COUNT(*) AS \"借阅次数\" FROM loans l JOIN books b ON l.\"图书编号\" = b.\"图书编号\" GROUP BY b.\"书名\" ORDER BY \"借阅次数\" DESC LIMIT 3",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望前三['万历十五年', '国富论', '算法导论'] 实得['万历十五年', '国富论', '算法导论']",
+      "gen_ms": 1457.9,
+      "exec_ms": 2.9
+    },
+    {
+      "q": "总馆占整体借阅记录的比例是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(CASE WHEN \"分馆\" = '总馆' THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0), 2) AS \"总馆借阅占比(%)\" FROM loans",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈54.83 实得≈54.83",
+      "gen_ms": 1987.8,
+      "exec_ms": 0.9
+    }
+  ]
+}

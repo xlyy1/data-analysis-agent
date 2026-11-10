@@ -321,17 +321,9 @@ async def main() -> int:
     ds = ExcelDataSource(file_path=str(XLSX), file_name=XLSX.name)
     await ds.connect()
     ds.auto_add_total_columns()
-    tables = await ds.get_tables()
-    schema = {
-        "tables": [
-            {
-                "name": t.name,
-                "row_count": t.row_count,
-                "columns": [{"name": c.name, "dtype": c.dtype} for c in t.columns],
-            }
-            for t in tables
-        ]
-    }
+    from app.services.schema import describe_schema
+
+    schema = await describe_schema(ds)
     schema_text = json.dumps(schema, ensure_ascii=False)
 
     import pandas as pd
