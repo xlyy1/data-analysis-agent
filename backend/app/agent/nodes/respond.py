@@ -40,8 +40,36 @@ SQL解释: {sql_explanation}
 请生成最终回复:"""
 
 
+EMPTY_RESULT_MESSAGE = (
+    "查询已经执行成功，但返回 0 行数据。\n\n"
+    "可能的原因：\n"
+    "1. 筛选条件过窄（时间范围、地区、类别等）\n"
+    "2. 该口径下确实没有数据\n"
+    "3. 字段取值与你预期的不一致（例如渠道名、状态值）\n\n"
+    "我可以先帮你确认表里有哪些取值，或者放宽条件再查一次。"
+)
+
+
+def _append_warnings(response: str, warnings: list) -> str:
+    """把结果校验告警附在回复末尾，提醒用户核对。"""
+    if not warnings:
+        return response
+    lines = [f"- {w.get('message', '')}" for w in warnings if w.get("message")]
+    if not lines:
+        return response
+    return response + "\n\n---\n**ℹ️ 结果校验提示（建议核对）**\n" + "\n".join(lines)
+
+
 async def format_response(state: AgentState) -> AgentState:
     """生成最终回复"""
+    # 空结果：直接说明，不调用模型，避免在空数据上编造结论
+    if state.get("empty_result"):
+        return {**state, "final_response": EMPTY_RESULT_MESSAGE}
+
+    # 执行失败：直接回传错误，不进入分析
+    if state.get("error"):
+        return {**state, "final_response": f"分析出错：{state['error']}"}
+
     llm = get_llm()
     user_input = state.get("user_input", "")
     analysis_type = state.get("analysis_type", "summary")
@@ -65,6 +93,7 @@ async def format_response(state: AgentState) -> AgentState:
 
     try:
         resp = await llm.chat([{"role": "system", "content": full_prompt}, {"role": "user", "content": "请生成回复"}])
-        return {**state, "final_response": resp}
+        return {**state, "final_response": _append_warnings(resp, state.get("result_warnings") or [])}
     except Exception as e:
         return {**state, "final_response": f"抱歉，生成回复时出错: {e}"}
+

@@ -4,6 +4,7 @@
 """
 
 import json
+import time
 import uuid
 from datetime import datetime
 from typing import AsyncIterator
@@ -11,11 +12,15 @@ from typing import AsyncIterator
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
 
+from app.agent.context import compact_history, make_llm_summarizer
 from app.agent.graph import agent_app
+from app.agent.orchestrator import SubTask, dispatch
 from app.agent.state import AgentState
+from app.llm.factory import get_llm
 from app.models.conversation import Conversation, Message
 from app.datasource.factory import create_datasource
 from app.config import get_settings
+from app.observability.trace import new_trace_id, record as record_trace
 
 
 class ConversationService:
@@ -80,15 +85,25 @@ class ConversationService:
         datasource_configs: list[str],
     ) -> AgentState:
         """运行 Agent 并返回最终状态"""
-        # 获取历史消息
+        settings = get_settings()
+        task_id = new_trace_id()
+
+        # 历史消息：超过预算时压缩成「摘要 + 近窗」，避免长会话线性膨胀
         history = await self.get_messages(conv_id)
-        history_messages = []
-        for h in history[-20:]:
-            history_messages.append({"role": h.role, "content": h.content})
+        history_messages = [{"role": h.role, "content": h.content} for h in history]
+        compacted = await compact_history(
+            history_messages,
+            max_tokens=settings.context_max_tokens,
+            keep_recent=settings.context_keep_recent,
+            summarize=make_llm_summarizer(get_llm()),
+        )
+        if compacted.compacted:
+            record_trace(task_id, "context_compact", "ok", time.time(), 0.0, fields=compacted.stats())
 
         # 构建初始状态
         initial_state: AgentState = {
-            "messages": [],
+            "messages": compacted.messages,
+            "trace_id": task_id,
             "user_input": user_input,
             "datasource_ids": datasource_ids,
             "datasource_schemas": datasource_schemas,
@@ -100,6 +115,11 @@ class ConversationService:
             "generated_sql": "",
             "sql_explanation": "",
             "sql_needs_confirmation": False,
+            "sql_retry_count": 0,
+            "sql_error": "",
+            "empty_result": False,
+            "result_warnings": [],
+            "datasource_status": [],
             "query_result_json": "{}",
             "analysis_type": "summary",
             "analysis_summary": "",
@@ -111,8 +131,40 @@ class ConversationService:
             "error": "",
         }
 
-        # 运行 Graph
-        result = await agent_app.ainvoke(initial_state)
+        # 运行 Graph：主路径失败时，把失败原因回灌给模型重试一次（supervisor 调度）
+        async def run_pipeline(state: dict) -> dict:
+            return await agent_app.ainvoke(state)
+
+        async def run_pipeline_with_feedback(state: dict) -> dict:
+            retry_state = dict(state)
+            retry_state["user_input"] = (
+                f"{state['user_input']}\n\n（上一次执行失败：{state.get('error') or '未产出结果'}。"
+                "请修正后重新生成，只返回最终结果。）"
+            )
+            retry_state["sql_retry_count"] = 0
+            return await agent_app.ainvoke(retry_state)
+
+        dispatch_result = await dispatch(
+            [
+                SubTask("pipeline", run_pipeline, description="主分析链路", max_attempts=1, timeout_s=180.0),
+                SubTask(
+                    "pipeline_repair",
+                    run_pipeline_with_feedback,
+                    description="带失败回灌的重试链路",
+                    max_attempts=1,
+                    timeout_s=180.0,
+                ),
+            ],
+            initial_state,
+            task_id=task_id,
+        )
+        result = dispatch_result.state
+        if dispatch_result.failed:
+            result = {
+                **result,
+                "final_response": result.get("final_response") or "分析链路执行失败，请稍后重试或换个问法。",
+                "error": "; ".join(dispatch_result.notes) or result.get("error", ""),
+            }
         return result
 
     async def execute_sql_on_datasource(self, sql: str, datasource_id: str, datasource_config: dict) -> dict:

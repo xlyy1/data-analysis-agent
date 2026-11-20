@@ -16,7 +16,7 @@ class DeepSeekLLM(BaseLLM):
             model=_settings.deepseek_model,
             api_key=_settings.deepseek_api_key,
             base_url=_settings.deepseek_base_url,
-            temperature=0.1,
+            temperature=_settings.llm_temperature,
             streaming=True,
         )
 

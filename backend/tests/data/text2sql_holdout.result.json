@@ -1,0 +1,265 @@
+{
+  "summary": {
+    "dataset": "holdout_visits.db",
+    "holdout": true,
+    "note": "未参与任何提示词调整，只跑一次",
+    "cases": 25,
+    "correct_rate": 1.0,
+    "exec_rate": 1.0,
+    "avg_gen_ms": 1754.1,
+    "avg_exec_ms": 2.3,
+    "misses": []
+  },
+  "rows": [
+    {
+      "q": "一共多少笔到店记录",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"到店记录数\" FROM visits",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈8000.00 实得≈8000.00",
+      "gen_ms": 4008.0,
+      "exec_ms": 0.6
+    },
+    {
+      "q": "消费金额合计是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(\"消费金额\"), 2) AS \"消费金额合计\" FROM visits",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈2091263.20 实得≈2091263.20",
+      "gen_ms": 1579.4,
+      "exec_ms": 1.4
+    },
+    {
+      "q": "实付金额合计是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(\"实付金额\"), 2) AS \"实付金额合计\" FROM visits",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈1829469.80 实得≈1829469.80",
+      "gen_ms": 1167.4,
+      "exec_ms": 1.1
+    },
+    {
+      "q": "折扣金额合计是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(\"折扣金额\"), 2) AS \"折扣金额合计\" FROM visits",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈261793.40 实得≈261793.40",
+      "gen_ms": 1524.1,
+      "exec_ms": 0.9
+    },
+    {
+      "q": "平均消费金额是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(AVG(\"消费金额\"), 2) AS \"平均消费金额\" FROM visits",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈261.41 实得≈261.41",
+      "gen_ms": 1702.7,
+      "exec_ms": 1.0
+    },
+    {
+      "q": "2026年5月的消费金额是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(\"消费金额\"), 2) AS \"2026年5月消费金额\" FROM visits WHERE \"到店时间\" >= '2026-05-01' AND \"到店时间\" <= '2026-05-31'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈353587.20 实得≈353587.20",
+      "gen_ms": 1752.8,
+      "exec_ms": 1.3
+    },
+    {
+      "q": "2026年8月有多少笔到店记录",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"到店记录数\" FROM visits WHERE \"到店时间\" >= '2026-08-01' AND \"到店时间\" <= '2026-08-31'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈1328.00 实得≈1328.00",
+      "gen_ms": 1590.2,
+      "exec_ms": 1.3
+    },
+    {
+      "q": "每月分别多少笔到店记录",
+      "kind": "row_count",
+      "sql": "SELECT strftime('%Y-%m', \"到店时间\") AS \"月份\", COUNT(*) AS \"到店记录笔数\" FROM visits GROUP BY \"月份\" ORDER BY \"月份\" ASC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望6行 实得6行",
+      "gen_ms": 1514.4,
+      "exec_ms": 6.9
+    },
+    {
+      "q": "各会员等级的消费金额是多少",
+      "kind": "row_count",
+      "sql": "SELECT \"会员等级\", ROUND(SUM(\"消费金额\"), 2) AS \"消费金额合计\" FROM visits GROUP BY \"会员等级\" ORDER BY \"消费金额合计\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望4行 实得4行",
+      "gen_ms": 1208.3,
+      "exec_ms": 2.4
+    },
+    {
+      "q": "各城市的到店记录数是多少",
+      "kind": "row_count",
+      "sql": "SELECT s.\"城市\", COUNT(*) AS \"到店记录数\" FROM visits v JOIN stores s ON v.\"门店编码\" = s.\"门店编码\" GROUP BY s.\"城市\" ORDER BY \"到店记录数\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望7行 实得7行",
+      "gen_ms": 1539.0,
+      "exec_ms": 5.0
+    },
+    {
+      "q": "各区域的实付金额是多少",
+      "kind": "row_count",
+      "sql": "SELECT s.\"区域\", ROUND(SUM(v.\"实付金额\"), 2) AS \"实付金额合计\" FROM visits v JOIN stores s ON v.\"门店编码\" = s.\"门店编码\" GROUP BY s.\"区域\" ORDER BY \"实付金额合计\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望4行 实得4行",
+      "gen_ms": 1852.1,
+      "exec_ms": 2.9
+    },
+    {
+      "q": "消费金额最高的门店是哪个",
+      "kind": "top_name",
+      "sql": "SELECT s.\"门店名称\", s.\"城市\", SUM(v.\"消费金额\") AS \"总消费金额\" FROM visits v JOIN stores s ON v.\"门店编码\" = s.\"门店编码\" GROUP BY s.\"门店名称\", s.\"城市\" ORDER BY \"总消费金额\" DESC LIMIT 1",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望包含「滨江店」实得「滨江店」",
+      "gen_ms": 1959.8,
+      "exec_ms": 7.2
+    },
+    {
+      "q": "到店记录最少的城市是哪个",
+      "kind": "top_name",
+      "sql": "SELECT s.\"城市\", COUNT(*) AS \"到店记录数\" FROM visits v JOIN stores s ON v.\"门店编码\" = s.\"门店编码\" GROUP BY s.\"城市\" ORDER BY \"到店记录数\" ASC LIMIT 1",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望包含「深圳」实得「深圳」",
+      "gen_ms": 1444.0,
+      "exec_ms": 2.3
+    },
+    {
+      "q": "实付金额最高的会员等级是哪个",
+      "kind": "top_name",
+      "sql": "SELECT \"会员等级\", SUM(\"实付金额\") AS \"总实付金额\" FROM visits GROUP BY \"会员等级\" ORDER BY \"总实付金额\" DESC LIMIT 1",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望包含「普通」实得「普通」",
+      "gen_ms": 1688.6,
+      "exec_ms": 2.9
+    },
+    {
+      "q": "整体折扣率是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(\"折扣金额\") * 100.0 / NULLIF(SUM(\"消费金额\"), 0), 2) AS \"整体折扣率(%)\" FROM visits",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈12.52 实得≈12.52",
+      "gen_ms": 1503.6,
+      "exec_ms": 1.9
+    },
+    {
+      "q": "钻石会员的折扣率是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(\"折扣金额\") * 100.0 / NULLIF(SUM(\"消费金额\"), 0), 2) AS \"折扣率(%)\" FROM visits WHERE \"会员等级\" = '钻石'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈12.43 实得≈12.43",
+      "gen_ms": 1494.3,
+      "exec_ms": 1.0
+    },
+    {
+      "q": "华东区域占整体消费金额的比例是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(CASE WHEN s.\"区域\" = '华东' THEN v.\"消费金额\" ELSE 0 END) * 100.0 / NULLIF(SUM(v.\"消费金额\"), 0), 2) AS \"华东消费金额占比(%)\" FROM visits v JOIN stores s ON v.\"门店编码\" = s.\"门店编码\"",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈37.73 实得≈37.73",
+      "gen_ms": 2076.6,
+      "exec_ms": 2.0
+    },
+    {
+      "q": "上海的门店数量是多少",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(DISTINCT \"门店编码\") AS \"门店数量\" FROM stores WHERE \"城市\" = '上海'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈2.00 实得≈2.00",
+      "gen_ms": 1576.1,
+      "exec_ms": 0.6
+    },
+    {
+      "q": "深圳的实付金额是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(v.\"实付金额\") AS \"深圳实付金额\" FROM visits v JOIN stores s ON v.\"门店编码\" = s.\"门店编码\" WHERE s.\"城市\" = '深圳'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈223970.30 实得≈223970.30",
+      "gen_ms": 1978.8,
+      "exec_ms": 1.3
+    },
+    {
+      "q": "黄金会员有多少笔到店记录",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"到店记录数\" FROM visits WHERE \"会员等级\" = '黄金'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈1285.00 实得≈1285.00",
+      "gen_ms": 1580.8,
+      "exec_ms": 1.7
+    },
+    {
+      "q": "2026年4月华南区域的消费金额是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(v.\"消费金额\"), 2) AS \"消费金额合计\" FROM visits v JOIN stores s ON v.\"门店编码\" = s.\"门店编码\" WHERE v.\"到店时间\" >= '2026-04-01' AND v.\"到店时间\" <= '2026-04-30' AND s.\"区域\" = '华南'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈87985.50 实得≈87985.50",
+      "gen_ms": 2208.2,
+      "exec_ms": 0.9
+    },
+    {
+      "q": "各门店的平均消费金额是多少",
+      "kind": "row_count",
+      "sql": "SELECT s.\"门店名称\", ROUND(AVG(v.\"消费金额\"), 2) AS \"平均消费金额\" FROM visits v JOIN stores s ON v.\"门店编码\" = s.\"门店编码\" GROUP BY s.\"门店名称\" ORDER BY \"平均消费金额\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望8行 实得8行",
+      "gen_ms": 1751.9,
+      "exec_ms": 3.5
+    },
+    {
+      "q": "消费金额前三的门店",
+      "kind": "top3_names",
+      "sql": "SELECT s.\"门店名称\", SUM(v.\"消费金额\") AS \"总消费金额\" FROM visits v JOIN stores s ON v.\"门店编码\" = s.\"门店编码\" GROUP BY s.\"门店名称\" ORDER BY \"总消费金额\" DESC LIMIT 3",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望前三['滨江店', '天河店', '南开店'] 实得['滨江店', '天河店', '南开店']",
+      "gen_ms": 1761.5,
+      "exec_ms": 3.8
+    },
+    {
+      "q": "2026年第二季度的消费金额是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(\"消费金额\"), 2) AS \"2026年第二季度消费金额\" FROM visits WHERE \"到店时间\" >= '2026-04-01' AND \"到店时间\" <= '2026-06-30'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈1040506.30 实得≈1040506.30",
+      "gen_ms": 1586.3,
+      "exec_ms": 0.9
+    },
+    {
+      "q": "普通会员的实付金额是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(\"实付金额\") AS \"普通会员实付金额\" FROM visits WHERE \"会员等级\" = '普通'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈934579.00 实得≈934579.00",
+      "gen_ms": 1802.7,
+      "exec_ms": 1.8
+    }
+  ]
+}

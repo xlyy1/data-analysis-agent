@@ -17,6 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
 
 from app.database import get_db
+from app.services.schema import describe_schema
 from app.services.conversation import ConversationService
 from app.models.conversation import Conversation, Message
 
@@ -171,16 +172,7 @@ async def chat(
                 tables = await connector.get_tables()
                 await connector.disconnect()
 
-                schema_obj = {
-                    "tables": [
-                        {
-                            "name": t.name,
-                            "columns": [{"name": c.name, "dtype": c.dtype} for c in t.columns],
-                            "row_count": t.row_count,
-                        }
-                        for t in tables
-                    ]
-                }
+                schema_obj = await describe_schema(connector)
                 # Cache updated schema
                 ds.table_schema = json.dumps(schema_obj, ensure_ascii=False)
                 await db.commit()
@@ -297,9 +289,8 @@ async def chat_stream(
                 await connector.connect()
                 if hasattr(connector, "auto_add_total_columns"):
                     connector.auto_add_total_columns()
-                tables = await connector.get_tables()
+                schema_obj = await describe_schema(connector)
                 await connector.disconnect()
-                schema_obj = {"tables": [{"name": t.name, "columns": [{"name": c.name, "dtype": c.dtype} for c in t.columns], "row_count": t.row_count} for t in tables]}
                 ds.table_schema = json.dumps(schema_obj, ensure_ascii=False)
                 await db.commit()
                 schemas.append(json.dumps(schema_obj, ensure_ascii=False))

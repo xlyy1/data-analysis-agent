@@ -3,6 +3,7 @@
 from langgraph.graph import StateGraph, END
 
 from app.agent.state import AgentState
+from app.config import get_settings
 from app.agent.nodes.understand import understand_intent
 from app.agent.nodes.query import generate_query
 from app.agent.nodes.execute import execute_query
@@ -10,6 +11,7 @@ from app.agent.nodes.analyze import analyze_results
 from app.agent.nodes.diagnose import diagnose
 from app.agent.nodes.visualize import generate_visualization
 from app.agent.nodes.respond import format_response
+from app.observability.trace import traced
 
 
 def should_clarify(state: AgentState) -> str:
@@ -37,16 +39,28 @@ def should_diagnose(state: AgentState) -> str:
     return "visualize"
 
 
+def route_after_execute(state: AgentState) -> str:
+    """执行后分三路：报错且还有重试次数则重写 SQL；空结果直接说明；否则进入分析。"""
+    if state.get("error"):
+        retries = state.get("sql_retry_count", 0)
+        if retries <= get_settings().max_sql_retries:
+            return "retry"
+        return "respond"
+    if state.get("empty_result"):
+        return "respond"
+    return "analyze"
+
+
 def build_agent_graph() -> StateGraph:
     workflow = StateGraph(AgentState)
 
-    workflow.add_node("understand_intent", understand_intent)
-    workflow.add_node("generate_query", generate_query)
-    workflow.add_node("execute_query", execute_query)
-    workflow.add_node("analyze_results", analyze_results)
-    workflow.add_node("diagnose", diagnose)
-    workflow.add_node("generate_visualization", generate_visualization)
-    workflow.add_node("format_response", format_response)
+    workflow.add_node("understand_intent", traced("understand_intent")(understand_intent))
+    workflow.add_node("generate_query", traced("generate_query")(generate_query))
+    workflow.add_node("execute_query", traced("execute_query")(execute_query))
+    workflow.add_node("analyze_results", traced("analyze_results")(analyze_results))
+    workflow.add_node("diagnose", traced("diagnose")(diagnose))
+    workflow.add_node("generate_visualization", traced("generate_visualization")(generate_visualization))
+    workflow.add_node("format_response", traced("format_response")(format_response))
 
     workflow.set_entry_point("understand_intent")
 
@@ -62,8 +76,15 @@ def build_agent_graph() -> StateGraph:
         {"confirm": END, "execute": "execute_query"},
     )
 
-    # execute_query always goes to analyze_results (or END on error)
-    workflow.add_edge("execute_query", "analyze_results")
+    workflow.add_conditional_edges(
+        "execute_query",
+        route_after_execute,
+        {
+            "retry": "generate_query",
+            "respond": "format_response",
+            "analyze": "analyze_results",
+        },
+    )
 
     workflow.add_conditional_edges(
         "analyze_results",

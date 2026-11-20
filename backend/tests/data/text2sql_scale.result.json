@@ -1,0 +1,316 @@
+{
+  "summary": {
+    "dataset": "sales_large.db",
+    "rows": 30000,
+    "tables": 2,
+    "cases": 30,
+    "correct_rate": 1.0,
+    "exec_rate": 1.0,
+    "avg_gen_ms": 1696.0,
+    "avg_exec_ms": 14.2,
+    "temperature": 0.0,
+    "misses": []
+  },
+  "rows": [
+    {
+      "q": "一共有多少笔订单",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(*) AS \"订单总数\" FROM orders",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈30000.00 实得≈30000.00",
+      "gen_ms": 4599.8,
+      "exec_ms": 1.8
+    },
+    {
+      "q": "总销售额是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(\"销售额\") AS \"总销售额\" FROM orders",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈88896454.00 实得≈88896454.00",
+      "gen_ms": 1121.3,
+      "exec_ms": 10.7
+    },
+    {
+      "q": "总利润是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(\"利润\") AS \"总利润\" FROM orders",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈35961439.00 实得≈35961439.00",
+      "gen_ms": 1414.3,
+      "exec_ms": 3.8
+    },
+    {
+      "q": "总成本是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(\"成本\") AS \"总成本\" FROM orders",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈52935015.00 实得≈52935015.00",
+      "gen_ms": 1751.6,
+      "exec_ms": 2.5
+    },
+    {
+      "q": "总销量是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(\"销量\") AS \"总销量\" FROM orders",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈314916.00 实得≈314916.00",
+      "gen_ms": 1290.5,
+      "exec_ms": 2.5
+    },
+    {
+      "q": "平均订单金额是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(AVG(\"销售额\"), 2) AS \"平均订单金额\" FROM orders",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈2963.22 实得≈2963.22",
+      "gen_ms": 1317.0,
+      "exec_ms": 2.5
+    },
+    {
+      "q": "2026年3月的销售额是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(\"销售额\") AS \"总销售额\" FROM orders WHERE \"订单日期\" >= '2026-03-01' AND \"订单日期\" <= '2026-03-31'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈5914703.00 实得≈5914703.00",
+      "gen_ms": 1544.6,
+      "exec_ms": 5.0
+    },
+    {
+      "q": "2026年6月的订单数是多少",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(DISTINCT \"订单ID\") AS \"订单数\" FROM orders WHERE \"订单日期\" >= '2026-06-01' AND \"订单日期\" <= '2026-06-30'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈3157.00 实得≈3157.00",
+      "gen_ms": 1463.0,
+      "exec_ms": 7.5
+    },
+    {
+      "q": "2026年11月的利润是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(\"利润\") AS \"总利润\" FROM orders WHERE \"订单日期\" >= '2026-11-01' AND \"订单日期\" <= '2026-11-30'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈4448775.00 实得≈4448775.00",
+      "gen_ms": 1300.6,
+      "exec_ms": 3.8
+    },
+    {
+      "q": "每个月分别有多少订单",
+      "kind": "row_count",
+      "sql": "SELECT strftime('%Y-%m', \"订单日期\") AS \"月份\", COUNT(DISTINCT \"订单ID\") AS \"订单数\" FROM orders GROUP BY \"月份\" ORDER BY \"月份\" ASC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望12行 实得12行",
+      "gen_ms": 2055.6,
+      "exec_ms": 54.8
+    },
+    {
+      "q": "各销售渠道的销售额是多少",
+      "kind": "row_count",
+      "sql": "SELECT \"销售渠道\", SUM(\"销售额\") AS \"总销售额\" FROM orders GROUP BY \"销售渠道\" ORDER BY \"总销售额\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望5行 实得5行",
+      "gen_ms": 1357.5,
+      "exec_ms": 23.7
+    },
+    {
+      "q": "各城市的订单数是多少",
+      "kind": "row_count",
+      "sql": "SELECT \"客户城市\", COUNT(\"订单ID\") AS \"订单数\" FROM orders GROUP BY \"客户城市\" ORDER BY \"订单数\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望12行 实得12行",
+      "gen_ms": 1136.4,
+      "exec_ms": 13.6
+    },
+    {
+      "q": "各产品类别的销量是多少",
+      "kind": "row_count",
+      "sql": "SELECT p.\"产品类别\", SUM(o.\"销量\") AS \"总销量\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" GROUP BY p.\"产品类别\" ORDER BY \"总销量\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望4行 实得4行",
+      "gen_ms": 1732.1,
+      "exec_ms": 38.1
+    },
+    {
+      "q": "销量最高的产品是哪个",
+      "kind": "top_name",
+      "sql": "SELECT p.\"产品名称\", SUM(o.\"销量\") AS \"总销量\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" GROUP BY p.\"产品名称\" ORDER BY \"总销量\" DESC LIMIT 1",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望包含「蓝牙音箱」实得「蓝牙音箱」",
+      "gen_ms": 1435.7,
+      "exec_ms": 28.0
+    },
+    {
+      "q": "销售额最高的渠道是哪个",
+      "kind": "top_name",
+      "sql": "SELECT \"销售渠道\", SUM(\"销售额\") AS \"总销售额\" FROM orders GROUP BY \"销售渠道\" ORDER BY \"总销售额\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望包含「京东」实得「京东」",
+      "gen_ms": 1267.6,
+      "exec_ms": 20.5
+    },
+    {
+      "q": "利润最高的产品是哪个",
+      "kind": "top_name",
+      "sql": "SELECT p.\"产品名称\", SUM(o.\"利润\") AS \"总利润\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" GROUP BY p.\"产品名称\" ORDER BY \"总利润\" DESC LIMIT 1",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望包含「降噪耳机」实得「降噪耳机」",
+      "gen_ms": 1620.6,
+      "exec_ms": 21.2
+    },
+    {
+      "q": "销售额前三的产品",
+      "kind": "top3_names",
+      "sql": "SELECT p.\"产品名称\", SUM(o.\"销售额\") AS \"总销售额\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" GROUP BY p.\"产品名称\" ORDER BY \"总销售额\" DESC LIMIT 3",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望前三['降噪耳机', '智能手表', '机械键盘'] 实得['降噪耳机', '智能手表', '机械键盘']",
+      "gen_ms": 1449.6,
+      "exec_ms": 21.7
+    },
+    {
+      "q": "销量最低的类别是哪个",
+      "kind": "top_name",
+      "sql": "SELECT p.\"产品类别\", SUM(o.\"销量\") AS \"类别总销量\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" GROUP BY p.\"产品类别\" ORDER BY \"类别总销量\" ASC LIMIT 1",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望包含「穿戴设备」实得「穿戴设备」",
+      "gen_ms": 1967.5,
+      "exec_ms": 41.5
+    },
+    {
+      "q": "整体利润率是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(\"利润\") * 100.0 / NULLIF(SUM(\"销售额\"), 0), 2) AS \"整体利润率(%)\" FROM orders",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈40.45 实得≈40.45",
+      "gen_ms": 1518.7,
+      "exec_ms": 8.2
+    },
+    {
+      "q": "淘宝渠道的利润率是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(\"利润\") * 100.0 / NULLIF(SUM(\"销售额\"), 0), 2) AS \"利润率(%)\" FROM orders WHERE \"销售渠道\" = '淘宝'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈40.48 实得≈40.48",
+      "gen_ms": 1855.0,
+      "exec_ms": 11.4
+    },
+    {
+      "q": "音频设备类别的毛利率是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND((SUM(o.\"销售额\") - SUM(o.\"成本\")) * 100.0 / NULLIF(SUM(o.\"销售额\"), 0), 2) AS \"毛利率(%)\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" WHERE p.\"产品类别\" = '音频设备'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈39.88 实得≈39.88",
+      "gen_ms": 3508.1,
+      "exec_ms": 8.8
+    },
+    {
+      "q": "手机配件占整体销售额的比例是多少",
+      "kind": "scalar",
+      "sql": "SELECT ROUND(SUM(CASE WHEN p.\"产品类别\" = '手机配件' THEN o.\"销售额\" ELSE 0 END) * 100.0 / NULLIF(SUM(o.\"销售额\"), 0), 2) AS \"手机配件销售额占比(%)\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\"",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈4.31 实得≈4.31",
+      "gen_ms": 1970.7,
+      "exec_ms": 20.9
+    },
+    {
+      "q": "2026年5月淘宝的销售额是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(\"销售额\") AS \"淘宝销售额\" FROM orders WHERE \"订单日期\" >= '2026-05-01' AND \"订单日期\" <= '2026-05-31' AND \"销售渠道\" = '淘宝'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈2023194.00 实得≈2023194.00",
+      "gen_ms": 1457.7,
+      "exec_ms": 2.2
+    },
+    {
+      "q": "2026年12月京东的订单数是多少",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(DISTINCT \"订单ID\") AS \"订单数\" FROM orders WHERE \"订单日期\" >= '2026-12-01' AND \"订单日期\" <= '2026-12-31' AND \"销售渠道\" = '京东'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈1358.00 实得≈1358.00",
+      "gen_ms": 1561.6,
+      "exec_ms": 5.8
+    },
+    {
+      "q": "上海的订单数是多少",
+      "kind": "scalar",
+      "sql": "SELECT COUNT(DISTINCT \"订单ID\") AS \"订单数\" FROM orders WHERE \"客户城市\" = '上海'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈2487.00 实得≈2487.00",
+      "gen_ms": 1256.9,
+      "exec_ms": 5.3
+    },
+    {
+      "q": "深圳的销售额是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(\"销售额\") AS \"深圳销售额\" FROM orders WHERE \"客户城市\" = '深圳'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈7597128.00 实得≈7597128.00",
+      "gen_ms": 1421.4,
+      "exec_ms": 7.9
+    },
+    {
+      "q": "拼多多渠道的销量是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(\"销量\") AS \"拼多多总销量\" FROM orders WHERE \"销售渠道\" = '拼多多'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈55867.00 实得≈55867.00",
+      "gen_ms": 1338.5,
+      "exec_ms": 4.1
+    },
+    {
+      "q": "降噪耳机的销售额是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(o.\"销售额\") AS \"降噪耳机销售额\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" WHERE p.\"产品名称\" = '降噪耳机'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈23792934.00 实得≈23792934.00",
+      "gen_ms": 1477.8,
+      "exec_ms": 3.7
+    },
+    {
+      "q": "每个产品的销售额分别是多少",
+      "kind": "row_count",
+      "sql": "SELECT p.\"产品名称\", SUM(o.\"销售额\") AS \"总销售额\" FROM orders o JOIN products p ON o.\"产品ID\" = p.\"产品ID\" GROUP BY p.\"产品名称\" ORDER BY \"总销售额\" DESC LIMIT 100",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望12行 实得12行",
+      "gen_ms": 1624.8,
+      "exec_ms": 32.3
+    },
+    {
+      "q": "2026年第四季度的销售额是多少",
+      "kind": "scalar",
+      "sql": "SELECT SUM(\"销售额\") AS \"第四季度销售额\" FROM orders WHERE \"订单日期\" >= '2026-10-01' AND \"订单日期\" <= '2026-12-31'",
+      "exec_ok": true,
+      "correct": true,
+      "detail": "期望≈31109675.00 实得≈31109675.00",
+      "gen_ms": 2063.7,
+      "exec_ms": 12.7
+    }
+  ]
+}

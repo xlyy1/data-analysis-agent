@@ -1,0 +1,506 @@
+{
+  "rows": [
+    {
+      "case": "门店销售 #0",
+      "question": "对比这两项：C店 在第 3 期 为 36.2 万元，环比 -2%；A店 在第 4 期 为 49.3 万元，环比 -1%。哪个数值更高？只回答那个数字。",
+      "expected": "49.3",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.7147058823529412,
+      "full_answer": "49.3",
+      "compacted_answer": "49.3"
+    },
+    {
+      "case": "库存周转 #1",
+      "question": "对比这两项：SKU-2207 在第 5 期 为 69.4 天，环比 +1%；SKU-3315 在第 6 期 为 82.0 天，环比 +2%。哪个数值更高？只回答那个数字。",
+      "expected": "82.0",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.836860373978278,
+      "full_answer": "82.0",
+      "compacted_answer": "82.0"
+    },
+    {
+      "case": "客服工单 #2",
+      "question": "对比这两项：退款类 在第 7 期 为 12.1 分钟，环比 +4%；物流类 在第 8 期 为 25.2 分钟，环比 -4%。哪个数值更高？只回答那个数字。",
+      "expected": "25.2",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.7257344544793938,
+      "full_answer": "25.2",
+      "compacted_answer": "25.2"
+    },
+    {
+      "case": "广告投放 #3",
+      "question": "对比这两项：计划-甲 在第 3 期 为 57.2 倍，环比 +1%；计划-乙 在第 6 期 为 96.0 倍，环比 +4%。哪个数值更高？只回答那个数字。",
+      "expected": "96.0",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.688911573306112,
+      "full_answer": "96.0",
+      "compacted_answer": "96.0"
+    },
+    {
+      "case": "采购成本 #4",
+      "question": "对比这两项：供应商甲 在第 5 期 为 90.4 元，环比 +4%；供应商乙 在第 4 期 为 77.3 元，环比 +3%。哪个数值更高？只回答那个数字。",
+      "expected": "90.4",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.839844184752365,
+      "full_answer": "90.4",
+      "compacted_answer": "90.4"
+    },
+    {
+      "case": "门店销售 #5",
+      "question": "对比这两项：A店 在第 7 期 为 33.1 万元，环比 -2%；C店 在第 3 期 为 71.2 万元，环比 +3%。哪个数值更高？只回答那个数字。",
+      "expected": "71.2",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.7115196078431373,
+      "full_answer": "71.2",
+      "compacted_answer": "71.2"
+    },
+    {
+      "case": "库存周转 #6",
+      "question": "对比这两项：SKU-3315 在第 3 期 为 78.2 天，环比 +4%；SKU-3315 在第 9 期 为 66.3 天，环比 +1%。哪个数值更高？只回答那个数字。",
+      "expected": "78.2",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.7666554697122383,
+      "full_answer": "78.2",
+      "compacted_answer": "78.2"
+    },
+    {
+      "case": "客服工单 #7",
+      "question": "对比这两项：物流类 在第 5 期 为 21.4 分钟，环比 -2%；退款类 在第 4 期 为 98.3 分钟，环比 -3%。哪个数值更高？只回答那个数字。",
+      "expected": "98.3",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.7225163500467144,
+      "full_answer": "98.3",
+      "compacted_answer": "98.3"
+    },
+    {
+      "case": "广告投放 #8",
+      "question": "对比这两项：计划-乙 在第 4 期 为 15.3 倍，环比 -2%；计划-甲 在第 3 期 为 92.2 倍，环比 -3%。哪个数值更高？只回答那个数字。",
+      "expected": "92.2",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.6886563736123517,
+      "full_answer": "92.2",
+      "compacted_answer": "92.2"
+    },
+    {
+      "case": "采购成本 #9",
+      "question": "对比这两项：供应商甲 在第 3 期 为 99.2 元，环比 -2%；供应商乙 在第 6 期 为 48.0 元，环比 +1%。哪个数值更高？只回答那个数字。",
+      "expected": "99.2",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.6947134112409572,
+      "full_answer": "99.2",
+      "compacted_answer": "99.2"
+    },
+    {
+      "case": "门店销售 #10",
+      "question": "对比这两项：B店 在第 5 期 为 42.4 万元，环比 +1%；C店 在第 3 期 为 16.2 万元，环比 -1%。哪个数值更高？只回答那个数字。",
+      "expected": "42.4",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.714898309237932,
+      "full_answer": "42.4",
+      "compacted_answer": "42.4"
+    },
+    {
+      "case": "库存周转 #11",
+      "question": "对比这两项：SKU-1001 在第 7 期 为 75.1 天，环比 +4%；SKU-2207 在第 5 期 为 49.4 天，环比 +2%。哪个数值更高？只回答那个数字。",
+      "expected": "75.1",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.8368968991380276,
+      "full_answer": "75.1",
+      "compacted_answer": "75.1"
+    },
+    {
+      "case": "客服工单 #12",
+      "question": "对比这两项：质量问题 在第 3 期 为 30.2 分钟，环比 +1%；退款类 在第 7 期 为 82.1 分钟，环比 -4%。哪个数值更高？只回答那个数字。",
+      "expected": "82.1",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.7236118318629995,
+      "full_answer": "82.1",
+      "compacted_answer": "82.1"
+    },
+    {
+      "case": "广告投放 #13",
+      "question": "对比这两项：计划-甲 在第 5 期 为 63.4 倍，环比 +4%；计划-乙 在第 6 期 为 76.0 倍，环比 -4%。哪个数值更高？只回答那个数字。",
+      "expected": "76.0",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.8077560913381809,
+      "full_answer": "76.0",
+      "compacted_answer": "76.0"
+    },
+    {
+      "case": "采购成本 #14",
+      "question": "对比这两项：供应商乙 在第 4 期 为 57.3 元，环比 +4%；供应商甲 在第 3 期 为 44.2 元，环比 +3%。哪个数值更高？只回答那个数字。",
+      "expected": "57.3",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.6986758651385334,
+      "full_answer": "57.3",
+      "compacted_answer": "57.3"
+    },
+    {
+      "case": "门店销售 #15",
+      "question": "对比这两项：C店 在第 3 期 为 51.2 万元，环比 +4%；C店 在第 6 期 为 90.0 万元，环比 -2%。哪个数值更高？只回答那个数字。",
+      "expected": "90.0",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.7153883851997059,
+      "full_answer": "90.0",
+      "compacted_answer": "90.0"
+    },
+    {
+      "case": "库存周转 #16",
+      "question": "对比这两项：SKU-2207 在第 5 期 为 84.4 天，环比 -2%；SKU-2207 在第 8 期 为 33.2 天，环比 +1%。哪个数值更高？只回答那个数字。",
+      "expected": "84.4",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.73726631590731,
+      "full_answer": "84.4",
+      "compacted_answer": "84.4"
+    },
+    {
+      "case": "客服工单 #17",
+      "question": "对比这两项：退款类 在第 7 期 为 27.1 分钟，环比 +1%；质量问题 在第 3 期 为 65.2 分钟，环比 -3%。哪个数值更高？只回答那个数字。",
+      "expected": "65.2",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.7215360664244941,
+      "full_answer": "65.2",
+      "compacted_answer": "65.2"
+    },
+    {
+      "case": "广告投放 #18",
+      "question": "对比这两项：计划-甲 在第 3 期 为 72.2 倍，环比 -2%；计划-乙 在第 4 期 为 85.3 倍，环比 -1%。哪个数值更高？只回答那个数字。",
+      "expected": "85.3",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.6884806735553004,
+      "full_answer": "85.3",
+      "compacted_answer": "85.3"
+    },
+    {
+      "case": "采购成本 #19",
+      "question": "对比这两项：供应商甲 在第 5 期 为 15.4 元，环比 +1%；供应商乙 在第 6 期 为 28.0 元，环比 +2%。哪个数值更高？只回答那个数字。",
+      "expected": "28.0",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.7120284855902971,
+      "full_answer": "28.0",
+      "compacted_answer": "28.0"
+    },
+    {
+      "case": "门店销售 #20",
+      "question": "对比这两项：A店 在第 7 期 为 48.1 万元，环比 +4%；C店 在第 9 期 为 74.3 万元，环比 -3%。哪个数值更高？只回答那个数字。",
+      "expected": "74.3",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.7106101445724087,
+      "full_answer": "74.3",
+      "compacted_answer": "74.3"
+    },
+    {
+      "case": "库存周转 #21",
+      "question": "对比这两项：SKU-3315 在第 3 期 为 93.2 天，环比 +1%；SKU-1001 在第 4 期 为 16.3 天，环比 +2%。哪个数值更高？只回答那个数字。",
+      "expected": "93.2",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.8366730101869473,
+      "full_answer": "93.2",
+      "compacted_answer": "93.2"
+    },
+    {
+      "case": "客服工单 #22",
+      "question": "对比这两项：物流类 在第 5 期 为 36.4 分钟，环比 +4%；质量问题 在第 6 期 为 49.0 分钟，环比 -4%。哪个数值更高？只回答那个数字。",
+      "expected": "49.0",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.8421380384016606,
+      "full_answer": "49.0",
+      "compacted_answer": "49.0"
+    },
+    {
+      "case": "广告投放 #23",
+      "question": "对比这两项：计划-乙 在第 4 期 为 30.3 倍，环比 +4%；计划-乙 在第 6 期 为 56.0 倍，环比 -3%。哪个数值更高？只回答那个数字。",
+      "expected": "56.0",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.6906493175149891,
+      "full_answer": "56.0",
+      "compacted_answer": "56.0"
+    },
+    {
+      "case": "采购成本 #24",
+      "question": "对比这两项：供应商甲 在第 3 期 为 24.2 元，环比 +4%；供应商乙 在第 4 期 为 37.3 元，环比 -4%。哪个数值更高？只回答那个数字。",
+      "expected": "37.3",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.6950038945142984,
+      "full_answer": "37.3",
+      "compacted_answer": "37.3"
+    },
+    {
+      "case": "门店销售 #25",
+      "question": "对比这两项：B店 在第 5 期 为 57.4 万元，环比 -2%；C店 在第 3 期 为 31.2 万元，环比 -4%。哪个数值更高？只回答那个数字。",
+      "expected": "57.4",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.714898309237932,
+      "full_answer": "57.4",
+      "compacted_answer": "57.4"
+    },
+    {
+      "case": "库存周转 #26",
+      "question": "对比这两项：SKU-1001 在第 7 期 为 90.1 天，环比 +1%；SKU-3315 在第 3 期 为 38.2 天，环比 -3%。哪个数值更高？只回答那个数字。",
+      "expected": "90.1",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.7276390910108586,
+      "full_answer": "90.1",
+      "compacted_answer": "90.1"
+    },
+    {
+      "case": "客服工单 #27",
+      "question": "对比这两项：质量问题 在第 3 期 为 45.2 分钟，环比 -2%；质量问题 在第 9 期 为 33.3 分钟，环比 +4%。哪个数值更高？只回答那个数字。",
+      "expected": "45.2",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.8416190970420343,
+      "full_answer": "45.2",
+      "compacted_answer": "45.2"
+    },
+    {
+      "case": "广告投放 #28",
+      "question": "对比这两项：计划-甲 在第 5 期 为 78.4 倍，环比 +1%；计划-乙 在第 4 期 为 65.3 倍，环比 +0%。哪个数值更高？只回答那个数字。",
+      "expected": "78.4",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.6874601352213292,
+      "full_answer": "78.4",
+      "compacted_answer": "78.4"
+    },
+    {
+      "case": "采购成本 #29",
+      "question": "对比这两项：供应商乙 在第 4 期 为 72.3 元，环比 +1%；供应商乙 在第 6 期 为 98.0 元，环比 +3%。哪个数值更高？只回答那个数字。",
+      "expected": "98.0",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.7134750194725714,
+      "full_answer": "98.0",
+      "compacted_answer": "98.0"
+    },
+    {
+      "case": "门店销售 #30",
+      "question": "对比这两项：C店 在第 3 期 为 66.2 万元，环比 +1%；B店 在第 8 期 为 41.2 万元，环比 -3%。哪个数值更高？只回答那个数字。",
+      "expected": "66.2",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.7133055623621661,
+      "full_answer": "66.2",
+      "compacted_answer": "66.2"
+    },
+    {
+      "case": "库存周转 #31",
+      "question": "对比这两项：SKU-2207 在第 5 期 为 99.4 天，环比 +4%；SKU-3315 在第 3 期 为 73.2 天，环比 +2%。哪个数值更高？只回答那个数字。",
+      "expected": "99.4",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.8365610657114071,
+      "full_answer": "99.4",
+      "compacted_answer": "99.4"
+    },
+    {
+      "case": "客服工单 #32",
+      "question": "对比这两项：退款类 在第 7 期 为 42.1 分钟，环比 -2%；物流类 在第 5 期 为 16.4 分钟，环比 -4%。哪个数值更高？只回答那个数字。",
+      "expected": "42.1",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.7212247016087182,
+      "full_answer": "42.1",
+      "compacted_answer": "42.1"
+    },
+    {
+      "case": "广告投放 #33",
+      "question": "对比这两项：计划-甲 在第 3 期 为 87.2 倍，环比 +4%；计划-乙 在第 6 期 为 36.0 倍，环比 -2%。哪个数值更高？只回答那个数字。",
+      "expected": "87.2",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.8156652634264574,
+      "full_answer": "87.2",
+      "compacted_answer": "87.2"
+    },
+    {
+      "case": "采购成本 #34",
+      "question": "对比这两项：供应商甲 在第 5 期 为 30.4 元，环比 -2%；供应商乙 在第 4 期 为 17.3 元，环比 -3%。哪个数值更高？只回答那个数字。",
+      "expected": "30.4",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.6985645933014354,
+      "full_answer": "30.4",
+      "compacted_answer": "30.4"
+    },
+    {
+      "case": "门店销售 #35",
+      "question": "对比这两项：A店 在第 7 期 为 63.1 万元，环比 +1%；A店 在第 4 期 为 24.3 万元，环比 -2%。哪个数值更高？只回答那个数字。",
+      "expected": "63.1",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.714898309237932,
+      "full_answer": "63.1",
+      "compacted_answer": "63.1"
+    },
+    {
+      "case": "库存周转 #36",
+      "question": "对比这两项：SKU-3315 在第 3 期 为 18.2 天，环比 -2%；SKU-3315 在第 6 期 为 57.0 天，环比 +1%。哪个数值更高？只回答那个数字。",
+      "expected": "57.0",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.7667077129743647,
+      "full_answer": "57.0",
+      "compacted_answer": "57.0"
+    },
+    {
+      "case": "客服工单 #37",
+      "question": "对比这两项：物流类 在第 5 期 为 51.4 分钟，环比 +1%；物流类 在第 8 期 为 90.2 分钟，环比 +4%。哪个数值更高？只回答那个数字。",
+      "expected": "90.2",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.8421380384016606,
+      "full_answer": "90.2",
+      "compacted_answer": "90.2"
+    },
+    {
+      "case": "广告投放 #38",
+      "question": "对比这两项：计划-乙 在第 4 期 为 45.3 倍，环比 +1%；计划-甲 在第 3 期 为 32.2 倍，环比 +0%。哪个数值更高？只回答那个数字。",
+      "expected": "45.3",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.8235744355147341,
+      "full_answer": "45.3",
+      "compacted_answer": "45.3"
+    },
+    {
+      "case": "采购成本 #39",
+      "question": "对比这两项：供应商甲 在第 3 期 为 39.2 元，环比 +1%；供应商乙 在第 6 期 为 78.0 元，环比 +4%。哪个数值更高？只回答那个数字。",
+      "expected": "78.0",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.6932235451207299,
+      "full_answer": "78.0",
+      "compacted_answer": "78.0"
+    },
+    {
+      "case": "门店销售 #40",
+      "question": "对比这两项：B店 在第 5 期 为 72.4 万元，环比 +4%；A店 在第 7 期 为 98.1 万元，环比 -3%。哪个数值更高？只回答那个数字。",
+      "expected": "98.1",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.7144082332761579,
+      "full_answer": "98.1",
+      "compacted_answer": "98.1"
+    },
+    {
+      "case": "库存周转 #41",
+      "question": "对比这两项：SKU-1001 在第 7 期 为 15.1 天，环比 -2%；SKU-3315 在第 9 期 为 41.3 天，环比 +0%。哪个数值更高？只回答那个数字。",
+      "expected": "41.3",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.7252882570245158,
+      "full_answer": "41.3",
+      "compacted_answer": "41.3"
+    },
+    {
+      "case": "客服工单 #42",
+      "question": "对比这两项：质量问题 在第 3 期 为 60.2 分钟，环比 +4%；退款类 在第 4 期 为 73.3 分钟，环比 -4%。哪个数值更高？只回答那个数字。",
+      "expected": "73.3",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.8434872859366891,
+      "full_answer": "73.3",
+      "compacted_answer": "73.3"
+    },
+    {
+      "case": "广告投放 #43",
+      "question": "对比这两项：计划-甲 在第 5 期 为 93.4 倍，环比 -2%；计划-乙 在第 6 期 为 16.0 倍，环比 -1%。哪个数值更高？只回答那个数字。",
+      "expected": "93.4",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.8217884934302845,
+      "full_answer": "93.4",
+      "compacted_answer": "93.4"
+    },
+    {
+      "case": "采购成本 #44",
+      "question": "对比这两项：供应商乙 在第 4 期 为 87.3 元，环比 -2%；供应商甲 在第 3 期 为 74.2 元，环比 -3%。哪个数值更高？只回答那个数字。",
+      "expected": "87.3",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.8310893512851897,
+      "full_answer": "87.3",
+      "compacted_answer": "87.3"
+    },
+    {
+      "case": "门店销售 #45",
+      "question": "对比这两项：C店 在第 3 期 为 81.2 万元，环比 -2%；A店 在第 4 期 为 94.3 万元，环比 -1%。哪个数值更高？只回答那个数字。",
+      "expected": "94.3",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.8168341092869394,
+      "full_answer": "94.3",
+      "compacted_answer": "94.3"
+    },
+    {
+      "case": "库存周转 #46",
+      "question": "对比这两项：SKU-2207 在第 5 期 为 24.4 天，环比 +1%；SKU-3315 在第 3 期 为 88.2 天，环比 -1%。哪个数值更高？只回答那个数字。",
+      "expected": "88.2",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.7529385424829285,
+      "full_answer": "88.2",
+      "compacted_answer": "88.2"
+    },
+    {
+      "case": "客服工单 #47",
+      "question": "对比这两项：退款类 在第 7 期 为 57.1 分钟，环比 +4%；质量问题 在第 3 期 为 95.2 分钟，环比 +0%。哪个数值更高？只回答那个数字。",
+      "expected": "95.2",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.843798650752465,
+      "full_answer": "95.2",
+      "compacted_answer": "95.2"
+    },
+    {
+      "case": "广告投放 #48",
+      "question": "对比这两项：计划-甲 在第 3 期 为 12.2 倍，环比 +1%；计划-乙 在第 4 期 为 25.3 倍，环比 +2%。哪个数值更高？只回答那个数字。",
+      "expected": "25.3",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.8180890419696389,
+      "full_answer": "25.3",
+      "compacted_answer": "25.3"
+    },
+    {
+      "case": "采购成本 #49",
+      "question": "对比这两项：供应商甲 在第 5 期 为 45.4 元，环比 +4%；供应商乙 在第 6 期 为 58.0 元，环比 -4%。哪个数值更高？只回答那个数字。",
+      "expected": "58.0",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.6941137198175142,
+      "full_answer": "58.0",
+      "compacted_answer": "58.0"
+    }
+  ],
+  "full_acc": 1.0,
+  "comp_acc": 1.0
+}

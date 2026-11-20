@@ -3,33 +3,43 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 .venv/
-*.db
+venv/
 
 # Node
 node_modules/
 dist/
+.vite/
 
-# IDE
-.idea/
-.vscode/
-*.swp
-
-# Environment
-.env
-
-# Data (uploaded files, logs, test data)
-data/uploads/*
-!data/uploads/.gitkeep
+# 数据与运行产物
 data/*.db
-*.xlsx
-*.xls
-*.csv
-!sample_data/*
+data/*.db.bak
+data/*.sqlite
+*.log
 
-# Windows scripts
-*.ps1
-*.bat
+# 环境变量
+.env
+.env.local
 
-# OS
+# 编辑器 / 系统
+.vscode/
+.idea/
 .DS_Store
 Thumbs.db
+
+# 工具产物
+.codegraph/
+.reasonix/
+.agents/
+playwright-mcp/
+
+# 备份与临时文件（本机改动时生成）
+*.bak
+nul
+
+# 业务数据文件
+*.xlsx
+
+# 打包产物
+release/
+release.zip
+

@@ -35,12 +35,36 @@ GROUP them:
 | "某产品的销量" / "总销量" | That product's total sales across ALL platforms AND ALL orders | GROUP BY 产品, SUM("总销量") |
 | "某产品的利润" / "总利润" | That product's total profit across ALL platforms AND ALL orders | GROUP BY 产品, SUM("总利润") |
 | "某产品的成本" / "总成本" | That product's total cost across ALL platforms AND ALL orders | GROUP BY 产品, SUM("总成本") |
-| "某产品的利率" / "利润率" | Per-product: total profit / total cost × 100 | GROUP BY 产品, SUM("总利润") / SUM("总成本") × 100 |
-| "某产品的毛利率" | Per-product: (revenue - cost) / cost × 100 | GROUP BY 产品, (SUM("总收入") / SUM("总成本") - 1) × 100 |
+| "某产品的利率" / "利润率" | Per-product: total profit / total revenue × 100（利润率分母是==收入==，不是成本） | GROUP BY 产品, SUM("总利润") / SUM("总收入") × 100 |
+| "某产品的毛利率" | Per-product: (SUM("总收入") - SUM("总成本")) / SUM("总收入") × 100 |
+| "某产品的成本加成率 / 加价率" | Per-product: (SUM("总收入") - SUM("总成本")) / SUM("总成本") × 100 | GROUP BY 产品, (SUM("总收入") / SUM("总成本") - 1) × 100 |
 | "总销量最高/最低的产品" | Group by product, sum, then rank | GROUP BY 产品, ORDER BY SUM("总销量") DESC |
 | "单个产品的X" / "每件产品的X" | Always GROUP BY product | GROUP BY 产品, then compute metric |
 | "哪个平台销量最高" | Compare across platforms | SUM each platform's "销量" column separately |
-| "单件利率" / "单件利润率" | Per-product profit rate | GROUP BY 产品, SUM("总利润")/SUM("总成本")×100 |
+| "单件利率" / "单件利润率" | Per-product profit rate | GROUP BY 产品, SUM("总利润")/SUM("总收入")×100 |
+
+### 过滤值必须与列的样本取值一致
+
+schema 中部分列附带 `sample_values`（该列的真实取值）。
+写 WHERE 条件前先看这一列有没有 sample_values：
+- 有：过滤值必须**取自 sample_values**，不能照抄问句里的说法
+  （例如问"黄金会员"，sample_values 是 ["普通","白银","黄金","钻石"]，应写 `会员等级 = '黄金'`）
+- 没有：保留问句中的值，不要自行加后缀或改写
+
+### 维度列的选择
+
+- 用户说的是**品类词**（如“手机配件”“音频设备”）→ 过滤条件落在 产品类别 列
+- 用户说的是**具体商品名**（如“充电宝”“运动耳机”）→ 过滤条件落在 产品名称 列
+- 拿不准时先看 schema 里两列的实际取值，不要默认用 产品名称
+
+### 指标口径（分母约定）
+
+- 利润率 / 利率 = 利润 ÷ 收入
+- 成本加成率 / 加价率 = 利润 ÷ 成本
+- 毛利率 = (收入 − 成本) ÷ 收入
+- 占比 = 部分 ÷ 整体（同类合计）
+
+若用户未说明口径且两种算法都可能，按上表默认值计算，不要替换分母。
 
 ### CRITICAL: When to use GROUP BY
 
@@ -139,6 +163,14 @@ async def generate_query(state: AgentState) -> AgentState:
     prompt = SQL_GEN_PROMPT.format(schema=schemas, question=user_input, intent=intent)
     full_prompt = today_context() + "\n\n" + prompt
 
+    previous_error = state.get("sql_error") or ""
+    if previous_error and state.get("sql_retry_count", 0) > 0:
+        full_prompt += (
+            "\n\n## 上一次 SQL 执行失败（必须修正）\n"
+            f"{previous_error}\n"
+            "上面的 SQL 已经执行报错。请检查列名、表名、聚合写法与方言差异，重新生成一条可执行的 SQL。\n"
+        )
+
     try:
         resp = await llm.chat([
             {"role": "system", "content": full_prompt},
@@ -156,6 +188,8 @@ async def generate_query(state: AgentState) -> AgentState:
             "generated_sql": sql,
             "sql_explanation": result.get("explanation", ""),
             "sql_needs_confirmation": not is_select,
+            "error": "",
+            "empty_result": False,
         }
     except Exception as e:
         return {**state, "error": f"SQL generation failed: {e}"}

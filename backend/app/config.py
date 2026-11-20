@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     deepseek_api_key: str = ""
     deepseek_base_url: str = "https://api.deepseek.com"
     deepseek_model: str = "deepseek-chat"
+    llm_temperature: float = 0.1  # 评测时建议设为 0，保证结果可复现
 
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "qwen2.5:7b"
@@ -34,6 +35,22 @@ class Settings(BaseSettings):
     max_query_rows: int = 100_000
     max_return_rows: int = 10_000
 
+    # --- SQL 失败重试 ---
+    max_sql_retries: int = 1
+
+    # --- 执行链路追踪 ---
+    trace_enabled: bool = True
+    trace_db_path: str = "../data/traces.db"
+
+    # --- 上下文压缩 ---
+    context_max_tokens: int = 4000
+    context_keep_recent: int = 8
+
+    # --- 取数超时与并行 ---
+    query_timeout_seconds: float = 10.0
+    query_retries: int = 1
+    parallel_datasources: bool = True
+
     # --- 邮件 ---
     smtp_host: str = ""
     smtp_port: int = 587
@@ -45,7 +62,8 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     log_retention_days: int = 90
 
-    model_config = {"env_file": ".env", "extra": "ignore"}
+    # 同时支持从仓库根（../.env）和 backend/ 目录（.env）启动
+    model_config = {"env_file": ("../.env", ".env"), "extra": "ignore"}
 
 
 @lru_cache()

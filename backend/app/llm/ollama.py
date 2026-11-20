@@ -15,7 +15,7 @@ class OllamaLLM(BaseLLM):
         self._client = ChatOllama(
             model=_settings.ollama_model,
             base_url=_settings.ollama_base_url,
-            temperature=0.1,
+            temperature=_settings.llm_temperature,
         )
 
     @property

@@ -60,6 +60,7 @@ export const useChatStore = defineStore('chat', () => {
     if (!currentConvId.value) {
       const id = await createConversation()
       currentConvId.value = id
+      // Set title from first message
       const idx = conversations.value.findIndex(c => c.id === id)
       if (idx >= 0) conversations.value[idx].title = text.slice(0, 30)
     }
@@ -81,6 +82,7 @@ export const useChatStore = defineStore('chat', () => {
 
       const data = res.data
 
+      // Update conversation title from first exchange
       const cidx = conversations.value.findIndex(c => c.id === currentConvId.value)
       if (cidx >= 0 && conversations.value[cidx].title === '新对话' && !data.needs_clarification) {
         conversations.value[cidx].title = text.slice(0, 30)

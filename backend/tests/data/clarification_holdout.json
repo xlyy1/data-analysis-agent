@@ -1,0 +1,17 @@
+{
+  "name": "clarification_holdout_10",
+  "notes": "留出集：在提示词修复完成后新写，未参与任何调参。只跑一次，跑完不再改。",
+  "schema": "表名: 销售数据 (Excel)\n列: 订单ID(int), 订单日期(date, 数据范围 2026-01-05 ~ 2026-03-31), 产品名称(text), 产品类别(text), 销售渠道(text), 销量(int), 单价(元)(float), 销售额(元)(float), 成本(元)(float), 利润(元)(float), 客户城市(text)\n行数: 51\n可计算指标: 毛利率=利润/销售额, 客单价=销售额/订单数",
+  "items": [
+    {"id": "h01", "expect_clarify": true, "text": "利润为什么掉了"},
+    {"id": "h02", "expect_clarify": true, "text": "哪个渠道更值得投"},
+    {"id": "h03", "expect_clarify": true, "text": "这个季度整体怎么样"},
+    {"id": "h04", "expect_clarify": true, "text": "算算转化率"},
+    {"id": "h05", "expect_clarify": true, "text": "比一下"},
+    {"id": "h06", "expect_clarify": false, "text": "哪款产品卖得最少"},
+    {"id": "h07", "expect_clarify": false, "text": "各产品的销售额和利润分别是多少"},
+    {"id": "h08", "expect_clarify": false, "text": "1月每天的销售额走势"},
+    {"id": "h09", "expect_clarify": false, "text": "哪个渠道的毛利率最高"},
+    {"id": "h10", "expect_clarify": false, "text": "总成本是多少"}
+  ]
+}
