@@ -76,3 +76,6 @@ class AgentState(TypedDict):
 
     # 错误信息
     error: str
+
+    # 本次执行的追踪 ID（由 app.observability.trace 在首个节点写入，同一次请求内共用）
+    trace_id: str

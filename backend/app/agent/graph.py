@@ -11,6 +11,7 @@ from app.agent.nodes.analyze import analyze_results
 from app.agent.nodes.diagnose import diagnose
 from app.agent.nodes.visualize import generate_visualization
 from app.agent.nodes.respond import format_response
+from app.observability.trace import traced
 
 
 def should_clarify(state: AgentState) -> str:
@@ -53,13 +54,13 @@ def route_after_execute(state: AgentState) -> str:
 def build_agent_graph() -> StateGraph:
     workflow = StateGraph(AgentState)
 
-    workflow.add_node("understand_intent", understand_intent)
-    workflow.add_node("generate_query", generate_query)
-    workflow.add_node("execute_query", execute_query)
-    workflow.add_node("analyze_results", analyze_results)
-    workflow.add_node("diagnose", diagnose)
-    workflow.add_node("generate_visualization", generate_visualization)
-    workflow.add_node("format_response", format_response)
+    workflow.add_node("understand_intent", traced("understand_intent")(understand_intent))
+    workflow.add_node("generate_query", traced("generate_query")(generate_query))
+    workflow.add_node("execute_query", traced("execute_query")(execute_query))
+    workflow.add_node("analyze_results", traced("analyze_results")(analyze_results))
+    workflow.add_node("diagnose", traced("diagnose")(diagnose))
+    workflow.add_node("generate_visualization", traced("generate_visualization")(generate_visualization))
+    workflow.add_node("format_response", traced("format_response")(format_response))
 
     workflow.set_entry_point("understand_intent")
 
