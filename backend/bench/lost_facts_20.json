@@ -1,0 +1,488 @@
+{
+  "rows": [
+    {
+      "case": "门店销售 #0",
+      "fact": "A店 在第 1 期 为 10.0 万元，环比 -4%",
+      "expected": "10.0",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "A店 第 1 期为 10.0 万元，环比 -4%。",
+      "comp_answer": "A店 第 1 期销售额为 10.0 万元，环比 -4%。",
+      "compression": 0.7161274629044028
+    },
+    {
+      "case": "门店销售 #0",
+      "fact": "B店 在第 2 期 为 27.1 万元，环比 -3%",
+      "expected": "27.1",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "B店 第 2 期 为 27.1 万元，环比 -3%。",
+      "comp_answer": "B店 第 2 期销售额为 27.1 万元，环比 -3%。",
+      "compression": 0.7161274629044028
+    },
+    {
+      "case": "门店销售 #0",
+      "fact": "C店 在第 3 期 为 44.2 万元，环比 -2%",
+      "expected": "44.2",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "C店 第 3 期为 44.2 万元，环比 -2%。",
+      "comp_answer": "C店 第 3 期销售额为 44.2 万元，环比 -2%。",
+      "compression": 0.7161274629044028
+    },
+    {
+      "case": "库存周转 #1",
+      "fact": "SKU-1001 在第 1 期 为 21.0 天，环比 -3%",
+      "expected": "21.0",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "SKU-1001 第 1 期为 21.0 天，环比 -3%。",
+      "comp_answer": "SKU-1001 第 1 期的库存周转天数为 21.0 天。",
+      "compression": 0.72506678539626
+    },
+    {
+      "case": "库存周转 #1",
+      "fact": "SKU-2207 在第 2 期 为 38.1 天，环比 -2%",
+      "expected": "38.1",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "SKU-2207 第 2 期为 38.1 天，环比 -2%。",
+      "comp_answer": "第 2 期 SKU-2207 的库存周转天数为 38.1 天，环比 -2%。",
+      "compression": 0.72506678539626
+    },
+    {
+      "case": "库存周转 #1",
+      "fact": "SKU-3315 在第 3 期 为 55.2 天，环比 -1%",
+      "expected": "55.2",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "SKU-3315 第 3 期为 55.2 天，环比 -1%。",
+      "comp_answer": "SKU-3315 第 3 期的库存周转天数为 55.2 天，环比-1%。",
+      "compression": 0.72506678539626
+    },
+    {
+      "case": "客服工单 #2",
+      "fact": "退款类 在第 1 期 为 32.0 分钟，环比 -2%",
+      "expected": "32.0",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "退款类 第 1 期为 32.0 分钟，环比 -2%。",
+      "comp_answer": "退款类 第 1 期 的首次响应时长为 32.0 分钟。",
+      "compression": 0.8412322274881516
+    },
+    {
+      "case": "客服工单 #2",
+      "fact": "物流类 在第 2 期 为 49.1 分钟，环比 -1%",
+      "expected": "49.1",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "物流类 第 2 期为 49.1 分钟，环比 -1%。",
+      "comp_answer": "物流类 第 2 期 的首次响应时长为 49.1 分钟。",
+      "compression": 0.8412322274881516
+    },
+    {
+      "case": "客服工单 #2",
+      "fact": "质量问题 在第 3 期 为 66.2 分钟，环比 +0%",
+      "expected": "66.2",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "质量问题 第 3 期为 66.2 分钟，环比 +0%。",
+      "comp_answer": "质量问题 第 3 期的首次响应时长为 66.2 分钟。",
+      "compression": 0.8412322274881516
+    },
+    {
+      "case": "广告投放 #3",
+      "fact": "计划-甲 在第 1 期 为 43.0 倍，环比 -1%",
+      "expected": "43.0",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "计划-甲 第 1 期为 43.0 倍，环比 -1%。",
+      "comp_answer": "计划-甲 第 1 期的ROI是 43.0 倍。",
+      "compression": 0.6817375886524824
+    },
+    {
+      "case": "广告投放 #3",
+      "fact": "计划-乙 在第 2 期 为 60.1 倍，环比 +0%",
+      "expected": "60.1",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "计划-乙 第 2 期为 60.1 倍，环比 +0%。",
+      "comp_answer": "计划-乙 第 2 期的ROI为 60.1 倍，环比+0%。",
+      "compression": 0.6817375886524824
+    },
+    {
+      "case": "广告投放 #3",
+      "fact": "计划-甲 在第 3 期 为 77.2 倍，环比 +1%",
+      "expected": "77.2",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "计划-甲 在第 3 期 为 77.2 倍，环比 +1%。",
+      "comp_answer": "计划-甲 第 3 期的ROI为 77.2 倍，环比 +1%。",
+      "compression": 0.6817375886524824
+    },
+    {
+      "case": "门店销售 #5",
+      "fact": "A店 在第 1 期 为 65.0 万元，环比 +1%",
+      "expected": "65.0",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "A店 第 1 期 为 65.0 万元，环比 +1%。",
+      "comp_answer": "A店 第 1 期销售额为 65.0 万元。",
+      "compression": 0.71770858671856
+    },
+    {
+      "case": "门店销售 #5",
+      "fact": "B店 在第 2 期 为 82.1 万元，环比 +2%",
+      "expected": "82.1",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "B店 第 2 期销售额为 82.1 万元，环比 +2%。",
+      "comp_answer": "B店 第 2 期销售额为 82.1 万元，环比 +2%。",
+      "compression": 0.71770858671856
+    },
+    {
+      "case": "门店销售 #5",
+      "fact": "C店 在第 3 期 为 99.2 万元，环比 +3%",
+      "expected": "99.2",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "C店 第 3 期为 99.2 万元，环比 +3%。",
+      "comp_answer": "C店 第 3 期销售额为 99.2 万元，环比 +3%。",
+      "compression": 0.71770858671856
+    },
+    {
+      "case": "库存周转 #6",
+      "fact": "SKU-1001 在第 1 期 为 76.0 天，环比 +2%",
+      "expected": "76.0",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "SKU-1001 第 1 期为 76.0 天，环比 +2%。",
+      "comp_answer": "SKU-1001 第 1 期的库存周转天数为 76.0 天。",
+      "compression": 0.8382680320569902
+    },
+    {
+      "case": "库存周转 #6",
+      "fact": "SKU-2207 在第 2 期 为 93.1 天，环比 +3%",
+      "expected": "93.1",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "SKU-2207 第 2 期为 93.1 天，环比 +3%。",
+      "comp_answer": "SKU-2207 第 2 期的库存周转天数是 93.1 天。",
+      "compression": 0.8382680320569902
+    },
+    {
+      "case": "库存周转 #6",
+      "fact": "SKU-3315 在第 3 期 为 20.2 天，环比 +4%",
+      "expected": "20.2",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "SKU-3315 在第 3 期为 20.2 天，环比 +4%。",
+      "comp_answer": "SKU-3315 第 3 期的库存周转天数为 20.2 天。",
+      "compression": 0.8382680320569902
+    },
+    {
+      "case": "客服工单 #7",
+      "fact": "退款类 在第 1 期 为 87.0 分钟，环比 +3%",
+      "expected": "87.0",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "退款类 第 1 期为 87.0 分钟，环比 +3%。",
+      "comp_answer": "退款类 第 1 期 的首次响应时长为 87.0 分钟。",
+      "compression": 0.7230579023284567
+    },
+    {
+      "case": "客服工单 #7",
+      "fact": "物流类 在第 2 期 为 14.1 分钟，环比 +4%",
+      "expected": "14.1",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "物流类 第 2 期为 14.1 分钟，环比 +4%。",
+      "comp_answer": "物流类 第 2 期 的首次响应时长为 14.1 分钟。",
+      "compression": 0.7230579023284567
+    },
+    {
+      "case": "客服工单 #7",
+      "fact": "质量问题 在第 3 期 为 31.2 分钟，环比 -4%",
+      "expected": "31.2",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "质量问题 第 3 期为 31.2 分钟，环比 -4%。",
+      "comp_answer": "质量问题 第 3 期 的首次响应时长为 31.2 分钟。",
+      "compression": 0.7230579023284567
+    },
+    {
+      "case": "广告投放 #8",
+      "fact": "计划-甲 在第 1 期 为 98.0 倍，环比 +4%",
+      "expected": "98.0",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "计划-甲 第 1 期为 98.0 倍，环比 +4%。",
+      "comp_answer": "计划-甲 第 1 期的ROI是 98.0 倍，环比 +4%。",
+      "compression": 0.6842705167173253
+    },
+    {
+      "case": "广告投放 #8",
+      "fact": "计划-乙 在第 2 期 为 25.1 倍，环比 -4%",
+      "expected": "25.1",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "计划-乙 第 2 期为 25.1 倍，环比 -4%。",
+      "comp_answer": "计划-乙 第 2 期的ROI是 25.1 倍，环比 -4%。",
+      "compression": 0.6842705167173253
+    },
+    {
+      "case": "广告投放 #8",
+      "fact": "计划-甲 在第 3 期 为 42.2 倍，环比 -3%",
+      "expected": "42.2",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "计划-甲 在第 3 期 为 42.2 倍，环比 -3%。",
+      "comp_answer": "计划-甲 第 3 期的ROI是 42.2 倍。",
+      "compression": 0.6842705167173253
+    },
+    {
+      "case": "门店销售 #10",
+      "fact": "A店 在第 1 期 为 30.0 万元，环比 -3%",
+      "expected": "30.0",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "A店 第 1 期为 30.0 万元，环比 -3%。",
+      "comp_answer": "A店 第 1 期销售额为 30.0 万元。",
+      "compression": 0.7186284046692607
+    },
+    {
+      "case": "门店销售 #10",
+      "fact": "B店 在第 2 期 为 47.1 万元，环比 -2%",
+      "expected": "47.1",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "B店 第 2 期 为 47.1 万元，环比 -2%。",
+      "comp_answer": "B店 第 2 期销售额为 47.1 万元。",
+      "compression": 0.7186284046692607
+    },
+    {
+      "case": "门店销售 #10",
+      "fact": "C店 在第 3 期 为 64.2 万元，环比 -1%",
+      "expected": "64.2",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "C店 第 3 期为 64.2 万元，环比 -1%。",
+      "comp_answer": "C店 第 3 期销售额为 64.2 万元。",
+      "compression": 0.7186284046692607
+    },
+    {
+      "case": "库存周转 #11",
+      "fact": "SKU-1001 在第 1 期 为 41.0 天，环比 -2%",
+      "expected": "41.0",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "SKU-1001 第 1 期为 41.0 天，环比 -2%。",
+      "comp_answer": "SKU-1001 第 1 期的库存周转天数为 41.0 天，环比 -2%。",
+      "compression": 0.7262408190518584
+    },
+    {
+      "case": "库存周转 #11",
+      "fact": "SKU-2207 在第 2 期 为 58.1 天，环比 -1%",
+      "expected": "58.1",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "SKU-2207 第 2 期为 58.1 天，环比 -1%。",
+      "comp_answer": "SKU-2207 第 2 期的库存周转天数为 58.1 天，环比 -1%。",
+      "compression": 0.7262408190518584
+    },
+    {
+      "case": "库存周转 #11",
+      "fact": "SKU-3315 在第 3 期 为 75.2 天，环比 +0%",
+      "expected": "75.2",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "SKU-3315 第 3 期为 75.2 天，环比 +0%。",
+      "comp_answer": "SKU-3315 第 3 期的库存周转天数为 75.2 天，环比+0%。",
+      "compression": 0.7262408190518584
+    },
+    {
+      "case": "客服工单 #12",
+      "fact": "退款类 在第 1 期 为 52.0 分钟，环比 -1%",
+      "expected": "52.0",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "退款类 第 1 期为 52.0 分钟，环比 -1%。",
+      "comp_answer": "退款类 第 1 期 的首次响应时长为 52.0 分钟。",
+      "compression": 0.8452822414503502
+    },
+    {
+      "case": "客服工单 #12",
+      "fact": "物流类 在第 2 期 为 69.1 分钟，环比 +0%",
+      "expected": "69.1",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "物流类 第 2 期为 69.1 分钟，环比 +0%。",
+      "comp_answer": "物流类 第 2 期的首次响应时长为 69.1 分钟。",
+      "compression": 0.8452822414503502
+    },
+    {
+      "case": "客服工单 #12",
+      "fact": "质量问题 在第 3 期 为 86.2 分钟，环比 +1%",
+      "expected": "86.2",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "质量问题 第 3 期为 86.2 分钟，环比 +1%。",
+      "comp_answer": "质量问题 第 3 期的首次响应时长为 86.2 分钟。",
+      "compression": 0.8452822414503502
+    },
+    {
+      "case": "广告投放 #13",
+      "fact": "计划-甲 在第 1 期 为 63.0 倍，环比 +0%",
+      "expected": "63.0",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "计划-甲 第 1 期 为 63.0 倍，环比 +0%。",
+      "comp_answer": "计划-甲 第 1 期的ROI为 63.0 倍。",
+      "compression": 0.6858698404659407
+    },
+    {
+      "case": "广告投放 #13",
+      "fact": "计划-乙 在第 2 期 为 80.1 倍，环比 +1%",
+      "expected": "80.1",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "计划-乙 第 2 期为 80.1 倍，环比 +1%。",
+      "comp_answer": "计划-乙 第 2 期的ROI为 80.1 倍。",
+      "compression": 0.6858698404659407
+    },
+    {
+      "case": "广告投放 #13",
+      "fact": "计划-甲 在第 3 期 为 97.2 倍，环比 +2%",
+      "expected": "97.2",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "计划-甲 第 3 期为 97.2 倍，环比 +2%。",
+      "comp_answer": "计划-甲 第 3 期的ROI是 97.2 倍。",
+      "compression": 0.6858698404659407
+    },
+    {
+      "case": "门店销售 #15",
+      "fact": "A店 在第 1 期 为 85.0 万元，环比 +2%",
+      "expected": "85.0",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "A店 第 1 期销售额为 85.0 万元，环比 +2%。",
+      "comp_answer": "A店 第 1 期销售额为 85.0 万元。",
+      "compression": 0.7209387159533074
+    },
+    {
+      "case": "门店销售 #15",
+      "fact": "B店 在第 2 期 为 12.1 万元，环比 +3%",
+      "expected": "12.1",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "B店 第 2 期 为 12.1 万元，环比 +3%。",
+      "comp_answer": "B店 第 2 期销售额为 12.1 万元。",
+      "compression": 0.7209387159533074
+    },
+    {
+      "case": "门店销售 #15",
+      "fact": "C店 在第 3 期 为 29.2 万元，环比 +4%",
+      "expected": "29.2",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "C店 第 3 期为 29.2 万元，环比 +4%。",
+      "comp_answer": "C店 第 3 期销售额为 29.2 万元。",
+      "compression": 0.7209387159533074
+    },
+    {
+      "case": "库存周转 #16",
+      "fact": "SKU-1001 在第 1 期 为 96.0 天，环比 +3%",
+      "expected": "96.0",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "SKU-1001 第 1 期为 96.0 天，环比 +3%。",
+      "comp_answer": "SKU-1001 第 1 期的库存周转天数为 96.0 天。",
+      "compression": 0.7251279768528822
+    },
+    {
+      "case": "库存周转 #16",
+      "fact": "SKU-2207 在第 2 期 为 23.1 天，环比 +4%",
+      "expected": "23.1",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "SKU-2207 第 2 期为 23.1 天，环比 +4%。",
+      "comp_answer": "SKU-2207 第 2 期的库存周转天数为 23.1 天，环比+4%。",
+      "compression": 0.7251279768528822
+    },
+    {
+      "case": "库存周转 #16",
+      "fact": "SKU-3315 在第 3 期 为 40.2 天，环比 -4%",
+      "expected": "40.2",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "SKU-3315 在第 3 期 为 40.2 天，环比 -4%。",
+      "comp_answer": "SKU-3315 第 3 期的库存周转天数为 40.2 天，环比 -4%。",
+      "compression": 0.7251279768528822
+    },
+    {
+      "case": "客服工单 #17",
+      "fact": "退款类 在第 1 期 为 17.0 分钟，环比 +4%",
+      "expected": "17.0",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "退款类 第 1 期为 17.0 分钟，环比 +4%。",
+      "comp_answer": "退款类 第 1 期的首次响应时长为 17.0 分钟，环比 +4%。",
+      "compression": 0.7221878862793571
+    },
+    {
+      "case": "客服工单 #17",
+      "fact": "物流类 在第 2 期 为 34.1 分钟，环比 -4%",
+      "expected": "34.1",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "物流类 第 2 期为 34.1 分钟，环比 -4%。",
+      "comp_answer": "物流类 第 2 期 的首次响应时长为 34.1 分钟。",
+      "compression": 0.7221878862793571
+    },
+    {
+      "case": "客服工单 #17",
+      "fact": "质量问题 在第 3 期 为 51.2 分钟，环比 -3%",
+      "expected": "51.2",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "质量问题 第 3 期为 51.2 分钟，环比 -3%。",
+      "comp_answer": "质量问题 第 3 期的首次响应时长为 51.2 分钟。",
+      "compression": 0.7221878862793571
+    },
+    {
+      "case": "广告投放 #18",
+      "fact": "计划-甲 在第 1 期 为 28.0 倍，环比 -4%",
+      "expected": "28.0",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "计划-甲 第 1 期 为 28.0 倍，环比 -4%。",
+      "comp_answer": "计划-甲 第 1 期的ROI是 28.0 倍，环比 -4%。",
+      "compression": 0.6843504684730312
+    },
+    {
+      "case": "广告投放 #18",
+      "fact": "计划-乙 在第 2 期 为 45.1 倍，环比 -3%",
+      "expected": "45.1",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "计划-乙 第 2 期为 45.1 倍，环比 -3%。",
+      "comp_answer": "计划-乙 第 2 期的ROI为 45.1 倍，环比 -3%。",
+      "compression": 0.6843504684730312
+    },
+    {
+      "case": "广告投放 #18",
+      "fact": "计划-甲 在第 3 期 为 62.2 倍，环比 -2%",
+      "expected": "62.2",
+      "full_ok": true,
+      "comp_ok": true,
+      "full_answer": "计划-甲 在第 3 期 为 62.2 倍，环比 -2%。",
+      "comp_answer": "计划-甲 第 3 期的ROI为 62.2 倍，环比 -2%。",
+      "compression": 0.6843504684730312
+    }
+  ],
+  "full_acc": 1.0,
+  "comp_acc": 1.0,
+  "lost": 176,
+  "facts": 320
+}

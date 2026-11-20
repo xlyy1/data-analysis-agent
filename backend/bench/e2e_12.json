@@ -1,0 +1,126 @@
+{
+  "rows": [
+    {
+      "case": "门店销售 #0",
+      "question": "A店 第 4 期的销售额是多少？",
+      "expected": "49.3",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.5641089727568108,
+      "full_answer": "A店 第 4 期 为 49.3 万元，环比 -1%。",
+      "compacted_answer": "A店 第 4 期销售额为 49.3 万元，环比 -1%。"
+    },
+    {
+      "case": "库存周转 #1",
+      "question": "SKU-2207 第 5 期的库存周转天数是多少？",
+      "expected": "69.4",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.5885211756537838,
+      "full_answer": "SKU-2207 第 5 期为 69.4 天，环比 +1%。",
+      "compacted_answer": "SKU-2207 第 5 期 为 69.4 天，环比 +1%。"
+    },
+    {
+      "case": "客服工单 #2",
+      "question": "质量问题 第 6 期的首次响应时长是多少？",
+      "expected": "89.0",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.5880455815953558,
+      "full_answer": "质量问题 第 6 期为 89.0 分钟，环比 +3%。",
+      "compacted_answer": "质量问题 第 6 期 的首次响应时长为 89.0 分钟，环比 +3%。"
+    },
+    {
+      "case": "广告投放 #3",
+      "question": "待办 9 是什么？",
+      "expected": "计划-乙",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.0,
+      "full_answer": "待办 9：确认 计划-乙 的数据是否缺失。",
+      "compacted_answer": "待办 9：确认 计划-乙 的数据是否缺失。"
+    },
+    {
+      "case": "采购成本 #4",
+      "question": "待办 10 是什么？",
+      "expected": "供应商甲",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.5808,
+      "full_answer": "待办 10：确认 供应商甲 的数据是否缺失。",
+      "compacted_answer": "待办10：确认供应商甲的数据是否缺失。"
+    },
+    {
+      "case": "门店销售 #5",
+      "question": "A店 第 4 期的销售额是多少？",
+      "expected": "84.3",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.5653586603349163,
+      "full_answer": "A店 第 4 期 为 84.3 万元，环比 +4%。",
+      "compacted_answer": "A店 第 4 期销售额为 84.3 万元，环比 +4%。"
+    },
+    {
+      "case": "库存周转 #6",
+      "question": "SKU-2207 第 5 期的库存周转天数是多少？",
+      "expected": "14.4",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.6209210830826197,
+      "full_answer": "SKU-2207 第 5 期为 14.4 天，环比 -3%。",
+      "compacted_answer": "SKU-2207 第 5 期为 14.4 天，环比 -3%。"
+    },
+    {
+      "case": "客服工单 #7",
+      "question": "质量问题 第 6 期的首次响应时长是多少？",
+      "expected": "34.0",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.592560739625887,
+      "full_answer": "质量问题 第 6 期为 34.0 分钟，环比 -1%。",
+      "compacted_answer": "质量问题 第 6 期 的首次响应时长为 34.0 分钟，环比 -1%。"
+    },
+    {
+      "case": "广告投放 #8",
+      "question": "待办 9 是什么？",
+      "expected": "计划-乙",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.0,
+      "full_answer": "待办 9：确认 计划-乙 的数据是否缺失。",
+      "compacted_answer": "待办 9：确认 计划-乙 的数据是否缺失。"
+    },
+    {
+      "case": "采购成本 #9",
+      "question": "待办 10 是什么？",
+      "expected": "供应商甲",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.5460571428571428,
+      "full_answer": "待办 10：确认 供应商甲 的数据是否缺失。",
+      "compacted_answer": "待办 10：确认 供应商甲 的数据是否缺失。"
+    },
+    {
+      "case": "门店销售 #10",
+      "question": "A店 第 4 期的销售额是多少？",
+      "expected": "29.3",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.5670746939795154,
+      "full_answer": "A店 第 4 期 为 29.3 万元，环比 +0%。",
+      "compacted_answer": "A店 第 4 期销售额为 29.3 万元，环比 +0%。"
+    },
+    {
+      "case": "库存周转 #11",
+      "question": "SKU-2207 第 5 期的库存周转天数是多少？",
+      "expected": "49.4",
+      "full_ok": true,
+      "compacted_ok": true,
+      "compression": 0.6220217441591487,
+      "full_answer": "SKU-2207 在第 5 期为 49.4 天，环比 +2%。",
+      "compacted_answer": "SKU-2207 第 5 期的库存周转天数为 49.4 天，环比 +2%。"
+    }
+  ],
+  "full_acc": 1.0,
+  "comp_acc": 1.0
+}
