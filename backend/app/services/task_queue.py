@@ -115,14 +115,10 @@ class TaskQueue:
 
     async def list(self, status: str | None = None, limit: int = 20) -> list[dict]:
         async with self._session_factory() as session:
-            stmt = select(BackgroundTask).order_by(BackgroundTask.created_at.desc()).limit(limit)
+            stmt = select(BackgroundTask)
             if status:
-                stmt = (
-                    select(BackgroundTask)
-                    .where(BackgroundTask.status == status)
-                    .order_by(BackgroundTask.created_at.desc())
-                    .limit(limit)
-                )
+                stmt = stmt.where(BackgroundTask.status == status)
+            stmt = stmt.order_by(BackgroundTask.created_at.desc()).limit(limit)
             rows = (await session.execute(stmt)).scalars().all()
             return [_to_dict(r) for r in rows]
 
