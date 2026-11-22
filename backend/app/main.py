@@ -5,14 +5,21 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import init_db
-from app.api import conversation, datasource, report
+from app.api import conversation, datasource, report, tasks
+from app.services import task_handlers  # noqa: F401  注册任务处理器
+from app.services.task_queue import task_queue
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 启动时初始化数据库
     await init_db()
-    yield
+    # 启动后台任务 worker，并恢复上次没跑完的任务
+    await task_queue.start()
+    try:
+        yield
+    finally:
+        await task_queue.stop()
 
 
 app = FastAPI(
@@ -35,6 +42,7 @@ app.add_middleware(
 app.include_router(conversation.router)
 app.include_router(datasource.router)
 app.include_router(report.router)
+app.include_router(tasks.router)
 
 
 @app.get("/api/health")
