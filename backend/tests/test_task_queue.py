@@ -6,7 +6,7 @@ import pytest
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from app.database import Base
-from app.models.task import FAILED, QUEUED, SUCCEEDED, BackgroundTask
+from app.models.task import FAILED, QUEUED, RUNNING, SUCCEEDED, BackgroundTask
 from app.services.task_queue import TaskQueue, register_handler
 
 
@@ -114,6 +114,31 @@ async def test_recover_pending_reruns_queued_task(factory):
         task = await _wait_terminal(queue, task_id)
         assert task["status"] == SUCCEEDED
         assert task["result"] == {"recovered": True}
+    finally:
+        await queue.stop()
+
+
+@pytest.mark.asyncio
+async def test_recover_pending_resets_running_and_reruns(factory):
+    """重启时 running 的任务要归位到 queued 并重新执行。"""
+
+    @register_handler("t_recover_running")
+    async def recover_running(payload):
+        return {"done": True}
+
+    async with factory() as session:
+        row = BackgroundTask(kind="t_recover_running", payload_json="{}", status=RUNNING, attempts=1)
+        session.add(row)
+        await session.commit()
+        task_id = row.id
+
+    queue = TaskQueue(factory, workers=1, max_retries=0, timeout_seconds=5)
+    await queue.start()
+    try:
+        task = await _wait_terminal(queue, task_id)
+        assert task["status"] == SUCCEEDED
+        assert task["attempts"] == 2  # 跑过一次（attempts=1）+ 恢复后再跑
+        assert task["result"] == {"done": True}
     finally:
         await queue.stop()
 

@@ -17,7 +17,7 @@ import json
 import logging
 from typing import Awaitable, Callable
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.config import get_settings
@@ -123,22 +123,31 @@ class TaskQueue:
             return [_to_dict(r) for r in rows]
 
     async def recover_pending(self) -> int:
-        """进程重启后把 queued/running 的任务重新入队，避免任务悬空。"""
+        """进程重启后把 queued/running 的任务重新入队，避免任务悬空。
+
+        恢复是启动路径，一次批量 UPDATE 把 running 归位，避免逐行提交。
+        """
         async with self._session_factory() as session:
             rows = (
                 await session.execute(
                     select(BackgroundTask).where(BackgroundTask.status.in_([QUEUED, RUNNING]))
                 )
             ).scalars().all()
-            for row in rows:
-                if row.status == RUNNING:
-                    row.status = QUEUED
-                await session.commit()
-                if self._queue is not None:
-                    await self._queue.put(row.id)
-        if rows:
-            logger.info("恢复未完成任务 %d 个", len(rows))
-        return len(rows)
+            if not rows:
+                return 0
+            ids = [row.id for row in rows]
+            await session.execute(
+                update(BackgroundTask)
+                .where(BackgroundTask.id.in_(ids), BackgroundTask.status == RUNNING)
+                .values(status=QUEUED)
+            )
+            await session.commit()
+
+        if self._queue is not None:
+            for task_id in ids:
+                await self._queue.put(task_id)
+        logger.info("恢复未完成任务 %d 个", len(ids))
+        return len(ids)
 
     # ---------- 执行 ----------
 
