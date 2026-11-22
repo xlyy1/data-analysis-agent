@@ -51,6 +51,11 @@ class Settings(BaseSettings):
     query_retries: int = 1
     parallel_datasources: bool = True
 
+    # --- 后台任务队列 ---
+    task_workers: int = 2
+    task_max_retries: int = 1
+    task_timeout_seconds: float = 60.0
+
     # --- 邮件 ---
     smtp_host: str = ""
     smtp_port: int = 587
