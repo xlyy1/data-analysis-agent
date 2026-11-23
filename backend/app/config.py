@@ -51,10 +51,15 @@ class Settings(BaseSettings):
     query_retries: int = 1
     parallel_datasources: bool = True
 
-    # --- 后台任务队列 ---
+    # --- 后台任务队列（跑在任务服务进程内）---
     task_workers: int = 2
     task_max_retries: int = 1
     task_timeout_seconds: float = 60.0
+
+    # --- 任务服务（拆分出去的下游服务）---
+    task_service_url: str = "http://127.0.0.1:8001"
+    task_service_timeout_seconds: float = 3.0
+    task_service_retries: int = 1
 
     # --- 邮件 ---
     smtp_host: str = ""

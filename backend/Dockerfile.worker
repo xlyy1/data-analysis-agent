@@ -1,0 +1,14 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY backend/requirements.txt backend/requirements.txt
+RUN pip install --no-cache-dir -r backend/requirements.txt
+
+COPY backend/ backend/
+
+ENV PYTHONUNBUFFERED=1
+WORKDIR /app/backend
+
+# 任务服务进程：消费队列、执行任务，可单独扩容/重启
+CMD ["uvicorn", "worker_service.main:app", "--host", "0.0.0.0", "--port", "8001"]
