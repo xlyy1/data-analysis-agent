@@ -6,20 +6,13 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import init_db
 from app.api import conversation, datasource, report, tasks
-from app.services import task_handlers  # noqa: F401  注册任务处理器
-from app.services.task_queue import task_queue
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # 启动时初始化数据库
+    # 初始化数据库；任务执行已拆到独立服务（worker_service），API 不再消费队列
     await init_db()
-    # 启动后台任务 worker，并恢复上次没跑完的任务
-    await task_queue.start()
-    try:
-        yield
-    finally:
-        await task_queue.stop()
+    yield
 
 
 app = FastAPI(

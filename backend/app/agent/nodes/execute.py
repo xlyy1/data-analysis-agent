@@ -20,6 +20,7 @@ from app.agent.validators import (
 from app.config import get_settings
 from app.datasource.factory import create_datasource
 from app.services.resilience import run_with_retry
+from app.services.sql_validator import validate_sql_columns
 
 
 def _datasource_label(cfg_str) -> str:
@@ -63,6 +64,23 @@ async def execute_query(state: AgentState) -> AgentState:
 
     if not configs:
         return {**state, "error": "No datasource configs available"}
+
+    # 硬约束：执行前校验列归属，未知列/维度字段未 JOIN 直接打回重写。
+    schemas = state.get("datasource_schemas", [])
+    if sql and len(configs) == 1 and schemas:
+        try:
+            raw = schemas[0]
+            schema = json.loads(raw) if isinstance(raw, str) else raw
+            valid, message = validate_sql_columns(sql, schema)
+        except Exception:  # noqa: BLE001
+            valid, message = True, ""
+        if not valid:
+            return {
+                **state,
+                "error": message,
+                "sql_error": message,
+                "sql_retry_count": state.get("sql_retry_count", 0) + 1,
+            }
 
     settings = get_settings()
 

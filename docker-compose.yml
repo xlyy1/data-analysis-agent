@@ -1,0 +1,36 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.api
+    environment:
+      # API 只转发任务请求，真正的执行在 task-worker
+      TASK_SERVICE_URL: http://task-worker:8001
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+    ports:
+      - "8000:8000"
+    depends_on:
+      task-worker:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/api/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  task-worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.worker
+    environment:
+      TASK_WORKERS: 4
+      TASK_MAX_RETRIES: 1
+      TASK_TIMEOUT_SECONDS: 120
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+    ports:
+      - "8001:8001"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8001/healthz')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5

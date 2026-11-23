@@ -1,0 +1,14 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY backend/requirements.txt backend/requirements.txt
+RUN pip install --no-cache-dir -r backend/requirements.txt
+
+COPY backend/ backend/
+
+ENV PYTHONUNBUFFERED=1
+WORKDIR /app/backend
+
+# API 进程：不跑任务队列，任务请求转发给 task-worker
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
