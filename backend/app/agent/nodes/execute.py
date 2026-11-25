@@ -19,7 +19,10 @@ from app.agent.validators import (
 )
 from app.config import get_settings
 from app.datasource.factory import create_datasource
+from app.observability.metrics import sql_executed_total, sql_guarded_total
 from app.services.resilience import run_with_retry
+from app.services.sql_policy import cap_cells, guard_sql
+from app.services.sql_validator import validate_sql_columns
 
 
 def _datasource_label(cfg_str) -> str:
@@ -38,13 +41,22 @@ async def _query_one(cfg_str: str, sql: str):
     async def attempt():
         connector = create_datasource(cfg["type"], cfg["config"])
         await connector.connect()
-        local_sql = sql
-        if hasattr(connector, "auto_add_total_columns"):
-            totals = connector.auto_add_total_columns()
-            if totals:
-                local_sql = _rewrite_sql_with_totals(sql, totals)
-        result = await connector.execute_query(local_sql)
-        return result, local_sql, connector
+        try:
+            local_sql = sql
+            if hasattr(connector, "auto_add_total_columns"):
+                totals = connector.auto_add_total_columns()
+                if totals:
+                    local_sql = _rewrite_sql_with_totals(sql, totals)
+            result = await connector.execute_query(local_sql)
+            return result, local_sql, connector
+        except BaseException:
+            # 失败/超时被取消的那一次尝试也必须关连接，否则重试会持续泄漏
+            # SQLite 文件句柄（表现为大量 ResourceWarning: unclosed database）。
+            try:
+                await connector.disconnect()
+            except Exception:  # noqa: BLE001
+                pass
+            raise
 
     payload, attempts = await run_with_retry(
         attempt,
@@ -64,7 +76,45 @@ async def execute_query(state: AgentState) -> AgentState:
     if not configs:
         return {**state, "error": "No datasource configs available"}
 
+    # 硬约束：执行前校验列归属，未知列/维度字段未 JOIN 直接打回重写。
+    schemas = state.get("datasource_schemas", [])
+    if sql and len(configs) == 1 and schemas:
+        try:
+            raw = schemas[0]
+            schema = json.loads(raw) if isinstance(raw, str) else raw
+            valid, message = validate_sql_columns(sql, schema)
+        except Exception:  # noqa: BLE001
+            valid, message = True, ""
+        if not valid:
+            return {
+                **state,
+                "error": message,
+                "sql_error": message,
+                "sql_retry_count": state.get("sql_retry_count", 0) + 1,
+            }
+
     settings = get_settings()
+
+    # 硬约束 2：只读 / 单语句 / 长度上限 / 自动 LIMIT。
+    # 这是最后一道闸：即使模型被 prompt 注入带偏，也写不了库。
+    decision = guard_sql(
+        sql,
+        max_chars=settings.sql_max_chars,
+        default_limit=settings.sql_default_limit,
+        allow_write=bool(state.get("allow_write")) and settings.sql_allow_write_for_admin,
+    )
+    if not decision.ok:
+        sql_guarded_total.inc(reason=decision.code)
+        return {
+            **state,
+            "error": decision.as_error(),
+            "sql_error": decision.as_error(),
+            "sql_retry_count": state.get("sql_retry_count", 0) + 1,
+        }
+    if decision.applied_limit:
+        sql_guarded_total.inc(reason="sql_limit_appended")
+    # 后续执行用规整后的 SQL（已补 LIMIT），状态里的 generated_sql 保留原文给用户看
+    sql = decision.sql
 
     # 多数据源并行：任一源成功即可继续，避免慢源拖住整条链路
     if settings.parallel_datasources and len(configs) > 1:
@@ -83,7 +133,7 @@ async def execute_query(state: AgentState) -> AgentState:
     errors: list[str] = []
     # 先完整记录每个源的成败，避免提前 return 时状态不全
     status: list[dict] = []
-    for cfg_str, outcome in zip(configs, outcomes):
+    for cfg_str, outcome in zip(configs, outcomes, strict=False):
         label = _datasource_label(cfg_str)
         if isinstance(outcome, BaseException):
             errors.append(f"{label}: {outcome}")
@@ -91,7 +141,7 @@ async def execute_query(state: AgentState) -> AgentState:
         else:
             status.append({"datasource": label, "ok": True})
 
-    for cfg_str, outcome in zip(configs, outcomes):
+    for cfg_str, outcome in zip(configs, outcomes, strict=False):
         if isinstance(outcome, BaseException):
             continue
 
@@ -125,12 +175,32 @@ async def execute_query(state: AgentState) -> AgentState:
         except Exception:  # noqa: BLE001
             pass
 
+        # 硬约束 3：行数 / 单元格上限，宽表按列数折算，避免一次分析把内存打满
+        max_rows = cap_cells(
+            len(result.columns),
+            settings.max_return_rows,
+            max_cells=settings.sql_max_result_cells,
+        )
+        rows = result.rows[:max_rows] if max_rows else result.rows
+        if len(rows) < len(result.rows):
+            warnings.append({
+                "level": "info",
+                "column": "__truncated__",
+                "message": (
+                    f"结果共 {len(result.rows)} 行，按行数上限展示前 {len(rows)} 行；"
+                    "需要完整数据请缩小查询范围或加筛选条件"
+                ),
+            })
+
         query_result = {
             "columns": result.columns,
-            "rows": result.rows,
-            "row_count": result.row_count,
+            "rows": rows,
+            "row_count": len(rows),
+            "total_row_count": len(result.rows),
             "elapsed_ms": result.elapsed_ms,
+            "executed_sql": executed_sql,
         }
+        sql_executed_total.inc(datasource_type=_datasource_label(cfg_str))
 
         # 部分成功：有源失败但至少一个成功时，继续出结果并明确告警，
         # 不让个别源不可用拖垮整次分析。
@@ -169,7 +239,6 @@ def _rewrite_sql_with_totals(sql: str, totals: dict[str, list[str]]) -> str:
 
     Also handles `SUM("京东销量" + "天猫销量" + "拼多多销量")` → `SUM("总销量")`.
     """
-    import re
 
     for total_col, member_cols in totals.items():
         members_sorted = sorted(member_cols, key=len, reverse=True)

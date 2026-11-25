@@ -1,10 +1,9 @@
-"""意图理解节点
+﻿"""意图理解节点
 
 识别用户的自然语言意图，判断分析类型、是否需要澄清。
 """
 
 import json
-from langchain_core.messages import HumanMessage, SystemMessage
 
 from app.agent.state import AgentState
 from app.agent.daysince import today_context
@@ -61,10 +60,6 @@ async def understand_intent(state: AgentState) -> AgentState:
     time_ctx = today_context()
     full_prompt = time_ctx + "\n\n" + prompt
 
-    messages = [
-        SystemMessage(content=prompt),
-        HumanMessage(content=user_input),
-    ]
 
     try:
         resp = await llm.chat([{"role": "system", "content": full_prompt}, {"role": "user", "content": user_input}])

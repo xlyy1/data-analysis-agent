@@ -1,5 +1,4 @@
 """部分成功降级测试：个别数据源失败不应拖垮整次查询。"""
-import asyncio
 import json
 
 import pytest

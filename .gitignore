@@ -11,10 +11,17 @@ dist/
 .vite/
 
 # æ•°æ®ä¸è¿è¡Œäº§ç‰©
-data/*.db
-data/*.db.bak
+data/
+backend/data/uploads/
+backend/data/*.db
+backend/data/*.db.bak
 data/*.sqlite
 *.log
+.coverage
+.coverage.json
+htmlcov/
+.migration_scratch.db
+ci-migrate.db
 
 # ç¯å¢ƒå˜é‡
 .env
@@ -43,3 +50,6 @@ nul
 release/
 release.zip
 
+
+# ±¾»ú×¨ÓÃ compose ¸²¸Ç£¨´úÀíµÈ»·¾³²îÒì£©
+docker-compose.override.yml

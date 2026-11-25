@@ -79,3 +79,6 @@ class AgentState(TypedDict):
 
     # 本次执行的追踪 ID（由 app.observability.trace 在首个节点写入，同一次请求内共用）
     trace_id: str
+
+    # 是否允许执行写 SQL（默认 False；只有管理员 + 打开 SQL_ALLOW_WRITE_FOR_ADMIN 才可能为真）
+    allow_write: bool

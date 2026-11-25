@@ -5,11 +5,11 @@
 """
 from __future__ import annotations
 
-import sqlite3
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from app.core.sqlite import sqlite_connection
 
 OUT = Path(__file__).resolve().parents[1] / "data" / "warehouse.db"
 ORDERS = 50_000
@@ -82,7 +82,7 @@ def main() -> None:
     OUT.parent.mkdir(parents=True, exist_ok=True)
     if OUT.exists():
         OUT.unlink()
-    with sqlite3.connect(OUT) as conn:
+    with sqlite_connection(OUT) as conn:
         orders_out.to_sql("orders", conn, index=False)
         customers.to_sql("customers", conn, index=False)
         products.to_sql("products", conn, index=False)

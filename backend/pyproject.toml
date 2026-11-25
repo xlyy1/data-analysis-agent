@@ -1,0 +1,37 @@
+[tool.ruff]
+# 只做「确定是错」的检查：语法/未定义名/未使用导入/明显 bug。
+# 刻意不开启全部规则，避免为了通过 lint 去大改既有代码风格。
+line-length = 120
+target-version = "py311"
+exclude = ["alembic/versions", ".venv", "venv"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "B"]
+ignore = [
+    "E501",  # 行长由 line-length 控制，中文注释很容易超，不强求
+    "B008",  # FastAPI 的 Depends() 默认值写法
+    "B904",  # raise ... from 在部分分支上可省略
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011"]
+# 这些是既有测试 / 已归档的评测脚本，只做功能维护，不为了过 lint 改风格
+"tests/test_agent.py" = ["E712"]
+"tests/evaluate_*.py" = ["F541", "B007"]
+"bench/*" = ["E402"]  # sys.path 调整后再导入
+"alembic/env.py" = ["E402"]
+
+[tool.coverage.run]
+branch = true
+source = ["app"]
+omit = ["app/main.py", "*/__init__.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]

@@ -3,8 +3,6 @@
 支持 Markdown、PDF、HTML 格式的报告导出。
 """
 
-import io
-import json
 import os
 from datetime import datetime
 
@@ -24,18 +22,18 @@ class ReportService:
     ) -> str:
         """生成 Markdown 报告"""
         lines = [
-            f"# 数据分析报告",
-            f"",
+            "# 数据分析报告",
+            "",
             f"**生成时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-            f"",
-            f"## 原始问题",
-            f"",
+            "",
+            "## 原始问题",
+            "",
             f"> {question}",
-            f"",
-            f"## 分析结论",
-            f"",
+            "",
+            "## 分析结论",
+            "",
             f"{analysis}",
-            f"",
+            "",
         ]
 
         if causes:

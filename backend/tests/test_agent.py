@@ -1,7 +1,7 @@
 """Agent 节点单元测试"""
 
 import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, patch
 
 from app.agent.state import AgentState
 

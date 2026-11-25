@@ -14,13 +14,14 @@ import sqlite3
 from pathlib import Path
 
 from app.observability.trace import get_db_path, load_trace, summarize
+from app.core.sqlite import sqlite_connection
 
 
 def list_tasks(limit: int = 20, db_path: Path | None = None) -> list[dict]:
     path = db_path or get_db_path()
     if not Path(path).exists():
         return []
-    with sqlite3.connect(path) as conn:
+    with sqlite_connection(path) as conn:
         conn.row_factory = sqlite3.Row
         rows = conn.execute(
             "SELECT task_id, COUNT(*) AS events, "

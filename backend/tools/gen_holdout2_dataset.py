@@ -5,11 +5,11 @@
 """
 from __future__ import annotations
 
-import sqlite3
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from app.core.sqlite import sqlite_connection
 
 OUT = Path(__file__).resolve().parents[1] / "data" / "holdout_library.db"
 LOANS = 6_000
@@ -48,7 +48,7 @@ def main() -> None:
     OUT.parent.mkdir(parents=True, exist_ok=True)
     if OUT.exists():
         OUT.unlink()
-    with sqlite3.connect(OUT) as conn:
+    with sqlite_connection(OUT) as conn:
         loans.to_sql("loans", conn, index=False)
         books.to_sql("books", conn, index=False)
         conn.execute("CREATE INDEX idx_loans_book ON loans(图书编号)")

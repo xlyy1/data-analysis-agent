@@ -3,8 +3,6 @@
 组合所有分析结果，生成友好的、结构化的最终回复。
 """
 
-import json
-from langchain_core.messages import HumanMessage, SystemMessage
 
 from app.agent.state import AgentState
 from app.agent.daysince import today_context

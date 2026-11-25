@@ -4,7 +4,7 @@ LLM 模型训练数据截止于 2024 年，不知道"今天"是什么日期。
 当用户问"上个月""去年""本周"时，Agent 必须基于真实日期计算时间范围。
 """
 
-from datetime import datetime, timedelta, timezone, tzinfo
+from datetime import datetime, timedelta, timezone
 
 # China Standard Time (UTC+8)
 _CST = timezone(timedelta(hours=8))

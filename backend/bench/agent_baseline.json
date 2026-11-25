@@ -1,0 +1,116 @@
+{
+  "summary": {
+    "cases": 8,
+    "clarification_accuracy": 1.0,
+    "exec_rate": 1.0,
+    "chart_rate_on_answered": 1.0,
+    "readonly_sql_rate": 1.0,
+    "model": "mock"
+  },
+  "cases": [
+    {
+      "id": "bar_by_city",
+      "question": "各城市的销售额排名",
+      "clarified": false,
+      "clarification_ok": true,
+      "has_sql": true,
+      "sql_only_readonly": true,
+      "exec_ok": true,
+      "has_rows": true,
+      "has_chart": true,
+      "has_answer": true,
+      "duration_ms": 32.4
+    },
+    {
+      "id": "bar_by_channel",
+      "question": "各渠道的销售额占比",
+      "clarified": false,
+      "clarification_ok": true,
+      "has_sql": true,
+      "sql_only_readonly": true,
+      "exec_ok": true,
+      "has_rows": true,
+      "has_chart": true,
+      "has_answer": true,
+      "duration_ms": 22.5
+    },
+    {
+      "id": "diagnose_profit",
+      "question": "哪个渠道的利润最低，为什么",
+      "clarified": false,
+      "clarification_ok": true,
+      "has_sql": true,
+      "sql_only_readonly": true,
+      "exec_ok": true,
+      "has_rows": true,
+      "has_chart": true,
+      "has_answer": true,
+      "duration_ms": 18.0
+    },
+    {
+      "id": "metric_revenue",
+      "question": "总销售额是多少",
+      "clarified": false,
+      "clarification_ok": true,
+      "has_sql": true,
+      "sql_only_readonly": true,
+      "exec_ok": true,
+      "has_rows": true,
+      "has_chart": true,
+      "has_answer": true,
+      "duration_ms": 14.9
+    },
+    {
+      "id": "metric_profit",
+      "question": "各品类的利润对比",
+      "clarified": false,
+      "clarification_ok": true,
+      "has_sql": true,
+      "sql_only_readonly": true,
+      "exec_ok": true,
+      "has_rows": true,
+      "has_chart": true,
+      "has_answer": true,
+      "duration_ms": 12.2
+    },
+    {
+      "id": "vague_sales",
+      "question": "帮我看看销售情况",
+      "clarified": true,
+      "clarification_ok": true,
+      "has_sql": false,
+      "sql_only_readonly": true,
+      "exec_ok": true,
+      "has_rows": false,
+      "has_chart": false,
+      "has_answer": false,
+      "duration_ms": 2.2
+    },
+    {
+      "id": "vague_perf",
+      "question": "最近表现怎么样",
+      "clarified": true,
+      "clarification_ok": true,
+      "has_sql": false,
+      "sql_only_readonly": true,
+      "exec_ok": true,
+      "has_rows": false,
+      "has_chart": false,
+      "has_answer": false,
+      "duration_ms": 2.1
+    },
+    {
+      "id": "vague_short",
+      "question": "分析一下",
+      "clarified": true,
+      "clarification_ok": true,
+      "has_sql": false,
+      "sql_only_readonly": true,
+      "exec_ok": true,
+      "has_rows": false,
+      "has_chart": false,
+      "has_answer": false,
+      "duration_ms": 1.9
+    }
+  ]
+}

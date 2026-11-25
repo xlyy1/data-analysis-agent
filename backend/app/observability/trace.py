@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any, Awaitable, Callable
 
 from app.config import get_settings
+from app.core.sqlite import sqlite_connection
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +66,7 @@ def get_db_path() -> Path:
 
 def init_db(db_path: Path | None = None) -> None:
     path = db_path or get_db_path()
-    with sqlite3.connect(path) as conn:
+    with sqlite_connection(path) as conn:
         conn.executescript(SCHEMA)
 
 
@@ -96,7 +97,7 @@ def record(
     try:
         path = db_path or get_db_path()
         init_db(path)
-        with sqlite3.connect(path) as conn:
+        with sqlite_connection(path) as conn:
             seq = conn.execute(
                 "SELECT COALESCE(MAX(seq), 0) + 1 FROM trace_events WHERE task_id = ?",
                 (task_id,),
@@ -178,7 +179,7 @@ def load_trace(task_id: str, db_path: Path | None = None) -> list[dict[str, Any]
     path = db_path or get_db_path()
     if not Path(path).exists():
         return []
-    with sqlite3.connect(path) as conn:
+    with sqlite_connection(path) as conn:
         conn.row_factory = sqlite3.Row
         rows = conn.execute(
             "SELECT * FROM trace_events WHERE task_id = ? ORDER BY seq", (task_id,)

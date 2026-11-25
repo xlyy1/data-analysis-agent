@@ -4,7 +4,6 @@
 """
 
 import json
-from langchain_core.messages import HumanMessage, SystemMessage
 
 from app.agent.state import AgentState
 from app.agent.daysince import today_context
@@ -63,9 +62,27 @@ async def diagnose(state: AgentState) -> AgentState:
         diag = json.loads(resp)
 
         causes_raw = diag.get("causes", [])
-        causes = [c.get("cause", "") for c in causes_raw]
-        evidence = [c.get("evidence", "") for c in causes_raw]
-        suggestions = [f"[{c.get('priority', '中')}优先级/{c.get('difficulty', '中等')}难度] {c.get('suggestion', '')}" for c in causes_raw]
+        # 兼容两种易出现的偏差输出，避免"建议为空"这种静默丢数据：
+        # 1) causes 是字符串列表（而非对象）；
+        # 2) 建议被放到顶层 suggestions 而不是 causes[].suggestion。
+        sibling_suggestions = diag.get("suggestions") or []
+        normalised = []
+        for item in causes_raw:
+            if isinstance(item, dict):
+                normalised.append(item)
+            elif isinstance(item, str):
+                normalised.append({"cause": item})
+        causes = [c.get("cause", "") for c in normalised]
+        evidence = [c.get("evidence", "") for c in normalised]
+        suggestions = []
+        for index, cause in enumerate(normalised):
+            suggestion = cause.get("suggestion") or ""
+            if not suggestion and index < len(sibling_suggestions):
+                sibling = sibling_suggestions[index]
+                suggestion = sibling.get("suggestion", "") if isinstance(sibling, dict) else str(sibling)
+            suggestions.append(
+                f"[{cause.get('priority', '中')}优先级/{cause.get('difficulty', '中等')}难度] {suggestion}"
+            )
 
         return {
             **state,

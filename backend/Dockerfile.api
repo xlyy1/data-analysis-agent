@@ -1,14 +1,38 @@
-FROM python:3.12-slim
+# API 镜像
+# 构建上下文是仓库根目录（需要同时拿到 backend/ 的代码）
+FROM python:3.12-slim AS base
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# 中文报告 PDF 需要 CJK 字体；curl 用于健康检查排查
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends fonts-noto-cjk curl \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 COPY backend/requirements.txt backend/requirements.txt
-RUN pip install --no-cache-dir -r backend/requirements.txt
+RUN pip install -r backend/requirements.txt
 
 COPY backend/ backend/
 
-ENV PYTHONUNBUFFERED=1
-WORKDIR /app/backend
+# 非 root 运行；/app/data 会被挂成数据卷，先建好并交给运行用户
+RUN useradd --create-home --uid 10001 appuser \
+    && mkdir -p /app/data \
+    && chown -R appuser:appuser /app/data
+USER appuser
 
-# API 进程：不跑任务队列，任务请求转发给 task-worker
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENV APP_ENV=prod \
+    DATA_DIR=/app/data
+
+WORKDIR /app/backend
+EXPOSE 8000
+
+HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=5 \
+    CMD python -c "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/healthz')"
+
+# 迁移在 app 启动的 lifespan 里执行（空库 / 旧库都能自愈）
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--forwarded-allow-ips", "*"]

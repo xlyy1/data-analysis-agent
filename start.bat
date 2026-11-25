@@ -1,112 +1,91 @@
 @echo off
+setlocal
 cd /d "%~dp0"
-title Data Agent
-
-set PYTHONPATH=
-set VIRTUAL_ENV=
-set PYTHONSTARTUP=
-set __PYVENV_LAUNCHER__=
-set PIP_REQUIRE_VIRTUALENV=
-
-set REAL_PYTHON=
-set PYHOME=
-
-if exist "%LOCALAPPDATA%\Programs\Python\Python313\python.exe" (
-    set REAL_PYTHON=%LOCALAPPDATA%\Programs\Python\Python313\python.exe
-    set PYHOME=%LOCALAPPDATA%\Programs\Python\Python313
-)
-if not defined REAL_PYTHON if exist "%LOCALAPPDATA%\Programs\Python\Python312\python.exe" (
-    set REAL_PYTHON=%LOCALAPPDATA%\Programs\Python\Python312\python.exe
-    set PYHOME=%LOCALAPPDATA%\Programs\Python\Python312
-)
-if not defined REAL_PYTHON if exist "C:\Python313\python.exe" (
-    set REAL_PYTHON=C:\Python313\python.exe
-    set PYHOME=C:\Python313
-)
-if not defined REAL_PYTHON (
-    for /f "delims=" %%P in ('where python 2^>nul') do (
-        if not defined REAL_PYTHON set REAL_PYTHON=%%P
-    )
-)
-
-if not defined REAL_PYTHON (
-    echo [ERROR] Python not found
-    echo Install Python 3.12+ from https://python.org
-    pause
-    goto :end
-)
-
-:: Derive PYHOME from REAL_PYTHON if not already set
-if not defined PYHOME (
-    for %%A in ("%REAL_PYTHON%") do set PYHOME=%%~dpA
-    set PYHOME=%PYHOME:~0,-1%
-)
-
-set PYTHONHOME=%PYHOME%
+title Data Agent - 本地一键启动
 
 echo.
-echo ==== Data Agent ====
+echo ============================================
+echo   对话式数据分析 Agent - 本地启动
+echo ============================================
+echo.
+
+rem ---- 1. 找 Python -------------------------------------------------------
+set "REAL_PYTHON="
+if exist "%LOCALAPPDATA%\Programs\Python\Python313\python.exe" set "REAL_PYTHON=%LOCALAPPDATA%\Programs\Python\Python313\python.exe"
+if not defined REAL_PYTHON if exist "%LOCALAPPDATA%\Programs\Python\Python313\python.exe" set "REAL_PYTHON=%LOCALAPPDATA%\Programs\Python\Python313\python.exe"
+if not defined REAL_PYTHON if exist "%LOCALAPPDATA%\Programs\Python\Python312\python.exe" set "REAL_PYTHON=%LOCALAPPDATA%\Programs\Python\Python312\python.exe"
+if not defined REAL_PYTHON (
+    for /f "delims=" %%P in ('where python 2^>nul') do if not defined REAL_PYTHON set "REAL_PYTHON=%%P"
+)
+if not defined REAL_PYTHON (
+    echo [ERROR] 没找到 Python。请安装 Python 3.12+ : https://python.org
+    pause & exit /b 1
+)
 echo [OK] Python: %REAL_PYTHON%
 
 node --version >nul 2>&1
-if %errorlevel% neq 0 (
-    echo [ERROR] Node.js not found
-    echo Install Node.js 18+ from https://nodejs.org
-    pause
-    goto :end
+if errorlevel 1 (
+    echo [ERROR] 没找到 Node.js。请安装 Node 20+ : https://nodejs.org
+    pause & exit /b 1
 )
+for /f "delims=" %%i in ('node --version') do echo [OK] Node.js %%i
 
-for /f "delims=" %%i in ('node --version 2^>^&1') do echo [OK] Node.js %%i
-
-if not exist "data" (
-    echo [1/3] Creating data folder...
-    mkdir data
+rem ---- 2. .env ------------------------------------------------------------
+if not exist ".env" (
+    echo [1/5] 未发现 .env，从 .env.example 复制
+    copy /y ".env.example" ".env" >nul
+    echo       默认 LLM_PROVIDER=mock（无需 API Key 即可跑通）
 ) else (
-    echo [1/3] data folder exists
+    echo [1/5] .env 已存在
 )
+if not exist "data" mkdir data
 
-echo [2/3] Installing backend...
-cd /d "%~dp0backend"
-if exist ".venv" rmdir /s /q .venv 2>nul
-
-"%REAL_PYTHON%" -m pip install --no-cache-dir -r requirements.txt
-if %errorlevel% neq 0 (
-    echo [ERROR] pip install failed
-    cd /d "%~dp0"
-    pause
-    goto :end
+rem ---- 3. 后端依赖 --------------------------------------------------------
+echo [2/5] 安装后端依赖 ...
+pushd backend
+"%REAL_PYTHON%" -m pip install --disable-pip-version-check -q -r requirements.txt
+if errorlevel 1 (
+    echo [ERROR] pip install 失败
+    popd & pause & exit /b 1
 )
-echo [OK] Backend ready
+echo [OK] 后端依赖就绪
+popd
 
-echo     Starting backend...
-start "Backend" cmd /k "set PYTHONHOME=%PYTHONHOME%&& set PYTHONPATH=&& set __PYVENV_LAUNCHER__=&& cd /d %~dp0backend&& "%REAL_PYTHON%" -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
-cd /d "%~dp0"
-
-echo [3/3] Setting up frontend...
-cd /d "%~dp0frontend"
-
+rem ---- 4. 前端依赖 --------------------------------------------------------
+echo [3/5] 检查前端依赖 ...
+pushd frontend
 if not exist "node_modules" (
-    echo     Installing frontend deps...
     call npm install --silent
-    if %errorlevel% neq 0 (
-        echo [ERROR] npm install failed
-        cd /d "%~dp0"
-        pause
-        goto :end
+    if errorlevel 1 (
+        echo [ERROR] npm install 失败
+        popd & pause & exit /b 1
     )
 )
-echo [OK] Frontend ready
+echo [OK] 前端依赖就绪
+popd
 
-echo     Starting frontend...
-start "Frontend" cmd /k "cd /d %~dp0frontend&& npm run dev"
-cd /d "%~dp0"
+rem ---- 5. 启动三个进程 ----------------------------------------------------
+echo [4/5] 启动 任务服务 (8001) ...
+start "Task Worker :8001" cmd /k "cd /d "%~dp0backend" && set TASK_SERVICE_URL=http://127.0.0.1:8001 && "%REAL_PYTHON%" -m uvicorn worker_service.main:app --host 127.0.0.1 --port 8001"
+
+echo [5/5] 启动 API (8000) 与 前端 (5199) ...
+start "API :8000" cmd /k "cd /d "%~dp0backend" && set TASK_SERVICE_URL=http://127.0.0.1:8001 && "%REAL_PYTHON%" -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+start "Frontend :5199" cmd /k "cd /d "%~dp0frontend" && npm run dev"
 
 echo.
-echo ==== Ready ====
-echo Backend : http://localhost:8000
-echo Frontend: http://localhost:3000
-echo Docs    : http://localhost:8000/docs
+echo ============================================
+echo  启动完成（首次启动会自动建库、迁移、播种样例数据）
 echo.
-
-:end
+echo  Web      : http://localhost:5199
+echo  API 文档 : http://localhost:8000/docs
+echo  探针     : http://localhost:8000/healthz  /readyz  /metrics
+echo.
+echo  演示账号 : admin / admin12345
+echo  想用真模型：编辑 .env，设 LLM_PROVIDER=deepseek 与 DEEPSEEK_API_KEY
+echo ============================================
+echo.
+echo  提示：想一条命令起全部（含前端打包），用 Docker：
+echo    docker compose up -d --build --wait
+echo.
 pause
+endlocal

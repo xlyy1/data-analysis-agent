@@ -79,7 +79,7 @@ def build_conversation(idx: int, facts_per_conv: int = 8, filler_turns: int = 70
     facts: list[str] = []
 
     facts.append(f"{scope}的{metric}口径为最近三个月，按周拆解")
-    facts.append(f"对比基准为去年同期")
+    facts.append("对比基准为去年同期")
     facts.append(f"数据源为 warehouse_{idx % 3}.db 的 fact_{metric} 表")
 
     for i, ent in enumerate(entities[:3]):

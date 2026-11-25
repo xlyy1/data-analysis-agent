@@ -1,4 +1,4 @@
-"""Excel / CSV 数据源
+﻿"""Excel / CSV 数据源
 
 上传的文件会被解析为 SQLite 内存数据库中的表，通过 SQL 查询。
 """
@@ -67,7 +67,7 @@ class ExcelDataSource(BaseDataSource):
         from collections import defaultdict
 
         totals_added = {}
-        for table_name, df in self._dfs.items():
+        for df in self._dfs.values():
             cols = list(df.columns)
             numeric_cols = set(c for c in cols if pd.api.types.is_numeric_dtype(df[c]))
             if len(numeric_cols) < 2:

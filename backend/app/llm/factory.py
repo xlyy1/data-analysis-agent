@@ -1,16 +1,30 @@
 """LLM 工厂函数 — 根据配置选择 provider"""
 
-from app.llm.base import BaseLLM
+from app.llm.base import BaseLLM, TimedLLM
 from app.config import get_settings
 from app.llm.deepseek import DeepSeekLLM
+from app.llm.mock import MockLLM
 from app.llm.ollama import OllamaLLM
 
 
 def get_llm(provider: str | None = None) -> BaseLLM:
-    """返回配置的 LLM 实例"""
+    """返回配置的 LLM 实例。
+
+    统一套一层 `TimedLLM`：任何 provider 都必须有硬超时，避免"模型不可达"变成
+    "接口永远不返回"。mock 是纯本地计算，不需要包装。
+    """
     settings = get_settings()
     provider = provider or settings.llm_provider
 
+    if provider == "mock":
+        # 离线/CI 用：确定性输出，不访问网络
+        return MockLLM()
+
+    impl = _create_provider(provider, settings)
+    return TimedLLM(impl, settings.llm_request_timeout_seconds)
+
+
+def _create_provider(provider: str, settings) -> BaseLLM:
     if provider == "deepseek":
         return DeepSeekLLM()
     elif provider == "ollama":
@@ -27,6 +41,8 @@ def get_llm(provider: str | None = None) -> BaseLLM:
                     base_url=settings.openai_base_url,
                     temperature=0.1,
                     streaming=True,
+                    timeout=settings.llm_request_timeout_seconds,
+                    max_retries=settings.llm_max_retries,
                 )
 
             @property

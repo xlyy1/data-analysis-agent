@@ -1,5 +1,7 @@
 <template>
-  <div class="app-shell">
+  <router-view v-if="isAuthLayout" />
+
+  <div v-else class="app-shell">
     <AppSidebar />
     <main class="app-main">
       <router-view v-slot="{ Component }">
@@ -12,7 +14,13 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+
 import AppSidebar from './components/AppSidebar.vue'
+
+const route = useRoute()
+const isAuthLayout = computed(() => route.meta.layout === 'auth')
 </script>
 
 <style>
@@ -151,10 +159,514 @@ html, body {
   opacity: 0;
 }
 
+/* ---------------------------------------------------------------- 页面骨架 */
+
+.page {
+  padding: 28px 40px 56px;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--fg-0);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-desc {
+  font-size: 13px;
+  color: var(--fg-2);
+  margin-top: 6px;
+  max-width: 640px;
+  line-height: 1.7;
+}
+
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.section-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+/* ---------------------------------------------------------------- 卡片 */
+
+.card {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--fg-1);
+}
+
+.card-title svg {
+  color: var(--accent);
+}
+
+.card-sub {
+  font-size: 12px;
+  color: var(--fg-3);
+  font-family: var(--font-mono);
+}
+
+.card-body {
+  padding: 18px;
+}
+
+.card-body.tight {
+  padding: 12px;
+}
+
+/* ---------------------------------------------------------------- 按钮 */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--fg-1);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease-out), border-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out), transform var(--dur-1) var(--ease-out);
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #ffffff;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-dim);
+}
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+.btn-secondary {
+  background: var(--bg-3);
+  border-color: var(--border);
+  color: var(--fg-1);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-4);
+  border-color: var(--border-strong);
+}
+
+.btn-ghost {
+  color: var(--fg-2);
+  border-color: transparent;
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--bg-3);
+  color: var(--fg-0);
+}
+
+.btn-danger {
+  color: var(--danger);
+  border-color: rgba(248, 113, 113, 0.25);
+  background: rgba(248, 113, 113, 0.08);
+}
+.btn-danger:hover:not(:disabled) {
+  background: rgba(248, 113, 113, 0.16);
+}
+
+.btn-sm {
+  padding: 4px 9px;
+  font-size: 12px;
+  gap: 5px;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* ---------------------------------------------------------------- 表单 */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fg-2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--fg-0);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  padding: 8px 11px;
+  outline: none;
+  transition: border-color var(--dur-1) var(--ease-out), box-shadow var(--dur-2) var(--ease-out),
+    background var(--dur-1) var(--ease-out);
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  border-color: var(--border-accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+  background: var(--bg-1);
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--fg-4);
+}
+
+.input:disabled,
+.select:disabled,
+.textarea:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 78px;
+  line-height: 1.65;
+}
+
+.select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%2371717A' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+  cursor: pointer;
+}
+
+.hint {
+  font-size: 11.5px;
+  color: var(--fg-3);
+  line-height: 1.6;
+}
+
+/* ---------------------------------------------------------------- 提示 / 徽标 */
+
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+  font-size: 13px;
+  color: var(--fg-1);
+  line-height: 1.6;
+}
+
+.alert-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.alert-title {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.alert-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-3);
+  margin-top: 4px;
+  word-break: break-all;
+}
+
+.alert-error {
+  border-color: rgba(248, 113, 113, 0.3);
+  background: rgba(248, 113, 113, 0.08);
+  color: #FCA5A5;
+}
+.alert-warn {
+  border-color: rgba(251, 191, 36, 0.28);
+  background: rgba(251, 191, 36, 0.07);
+  color: var(--warning);
+}
+.alert-info {
+  border-color: var(--accent-line);
+  background: var(--accent-hi);
+  color: #C7D2FE;
+}
+.alert-success {
+  border-color: rgba(74, 222, 128, 0.28);
+  background: rgba(74, 222, 128, 0.07);
+  color: #86EFAC;
+}
+
+.alert-close {
+  border: none;
+  background: transparent;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  padding: 0 2px;
+  font-family: var(--font-sans);
+}
+.alert-close:hover {
+  opacity: 1;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 500;
+  background: var(--bg-3);
+  color: var(--fg-2);
+  line-height: 1.6;
+}
+
+.badge-accent {
+  background: var(--accent-hi);
+  color: #A5B4FC;
+}
+.badge-success {
+  background: rgba(74, 222, 128, 0.12);
+  color: var(--success);
+}
+.badge-warn {
+  background: rgba(251, 191, 36, 0.12);
+  color: var(--warning);
+}
+.badge-danger {
+  background: rgba(248, 113, 113, 0.12);
+  color: var(--danger);
+}
+.badge-mono {
+  font-family: var(--font-mono);
+}
+
+/* ---------------------------------------------------------------- 骨架屏 / 空态 */
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-2);
+  border-radius: var(--radius-sm);
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  animation: skeletonSweep 1.5s infinite;
+}
+
+@keyframes skeletonSweep {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton-line {
+  height: 12px;
+  margin: 7px 0;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
+  padding: 56px 24px;
+  color: var(--fg-2);
+}
+
+.empty-icon {
+  color: var(--accent);
+  opacity: 0.75;
+  display: flex;
+  margin-bottom: 6px;
+}
+
+.empty h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--fg-1);
+}
+
+.empty p {
+  font-size: 13px;
+  color: var(--fg-3);
+  max-width: 400px;
+  line-height: 1.7;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  border-top-color: currentColor;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+.spinner.lg {
+  width: 22px;
+  height: 22px;
+  border-width: 2.5px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------------------------------------------------------------- 表格 / 文本工具 */
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+
+.data-table th {
+  text-align: left;
+  font-size: 11.5px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  font-weight: 600;
+  padding: 10px 14px;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--fg-1);
+  vertical-align: middle;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.muted {
+  color: var(--fg-3);
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---------------------------------------------------------------- Markdown */
+
 .markdown-content {
   line-height: 1.75;
   font-size: 14px;
   color: var(--fg-1);
+  word-break: break-word;
+}
+.markdown-content > :first-child {
+  margin-top: 0;
+}
+.markdown-content > :last-child {
+  margin-bottom: 0;
 }
 .markdown-content h1 {
   font-size: 1.4em;
@@ -205,7 +717,7 @@ html, body {
   border-radius: var(--radius-sm);
   font-family: var(--font-mono);
   font-size: 0.85em;
-  color: var(--accent);
+  color: #A5B4FC;
 }
 .markdown-content pre {
   background: var(--bg-1);
@@ -222,6 +734,10 @@ html, body {
   font-size: 13px;
   line-height: 1.6;
   border: none;
+}
+.markdown-content pre code.hljs {
+  background: transparent;
+  padding: 0;
 }
 .markdown-content blockquote {
   border-left: 2px solid var(--accent);

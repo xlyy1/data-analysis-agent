@@ -18,6 +18,9 @@ class DeepSeekLLM(BaseLLM):
             base_url=_settings.deepseek_base_url,
             temperature=_settings.llm_temperature,
             streaming=True,
+            # 客户端侧超时 + 重试；外层还有 TimedLLM 的硬超时兜底
+            timeout=_settings.llm_request_timeout_seconds,
+            max_retries=_settings.llm_max_retries,
         )
 
     @property

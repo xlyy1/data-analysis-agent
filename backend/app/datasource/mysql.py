@@ -1,8 +1,6 @@
 """MySQL 数据源适配器"""
 
 import time
-import asyncio
-from contextlib import asynccontextmanager
 
 from app.datasource.base import BaseDataSource, TableInfo, ColumnInfo, QueryResult
 from app.config import get_settings

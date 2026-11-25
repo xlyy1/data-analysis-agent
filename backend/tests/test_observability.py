@@ -1,11 +1,11 @@
 """执行链路追踪测试：事件落库、task_id 复用、异常记录、回放排序。"""
 
-import sqlite3
 
 import pytest
 
 from app.observability import trace
 from app.observability.replay import list_tasks
+from app.core.sqlite import sqlite_connection
 
 
 @pytest.fixture()
@@ -75,7 +75,7 @@ async def test_trace_disabled_writes_nothing(db, monkeypatch):
         return {**state}
 
     await node({"user_input": "x"})
-    with sqlite3.connect(db) as conn:
+    with sqlite_connection(db) as conn:
         count = conn.execute("SELECT COUNT(*) FROM trace_events").fetchone()[0]
     assert count == 0
 

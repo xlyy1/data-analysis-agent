@@ -1,0 +1,181 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.12"
+  NODE_VERSION: "22"
+  # CI 永远不碰付费 Key：LLM 用确定性 mock
+  LLM_PROVIDER: mock
+  APP_ENV: ci
+  DEEPSEEK_API_KEY: ""
+
+jobs:
+  # ---------------------------------------------------------------- 后端
+  backend:
+    name: 后端 测试 / 覆盖率 / 回归基线
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Lint (ruff)
+        run: python -m ruff check .
+
+      - name: 单元 / 接口测试 + 覆盖率门槛
+        env:
+          APP_ENV: test
+        run: |
+          python -m pytest -q --cov=app --cov-report=term-missing --cov-fail-under=70
+
+      - name: Agent 机制回归基线（离线，mock LLM）
+        run: python bench/agent_baseline.py
+
+      - name: 归档准确率门槛（不重跑付费评测）
+        run: python bench/quality_gate.py
+
+  # ---------------------------------------------------------------- 迁移
+  migrations:
+    name: 空库迁移 / 回滚可重放
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: 空库 upgrade head
+        env:
+          ALEMBIC_DATABASE_URL: sqlite:///./ci-migrate.db
+        run: python -m alembic upgrade head
+
+      - name: 校验关键表存在
+        run: |
+          python - <<'PY'
+          import sqlite3
+          required = {
+              "users", "refresh_tokens", "datasources", "conversations", "messages",
+              "background_tasks", "operation_logs", "reports",
+              "analysis_schedules", "schedule_runs", "alembic_version",
+          }
+          with sqlite3.connect("ci-migrate.db") as conn:
+              names = {row[0] for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+          missing = required - names
+          assert not missing, f"缺表: {sorted(missing)}"
+          print("tables ok:", len(names))
+          PY
+
+      - name: 模型与迁移是否同步（alembic check）
+        env:
+          ALEMBIC_DATABASE_URL: sqlite:///./ci-migrate.db
+        run: python -m alembic check
+
+      - name: 回滚到底再升回来
+        env:
+          ALEMBIC_DATABASE_URL: sqlite:///./ci-migrate.db
+        run: |
+          python -m alembic downgrade base
+          python -m alembic upgrade head
+
+  # ---------------------------------------------------------------- 前端
+  frontend:
+    name: 前端 构建 / Lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: 生产构建（含 vue-tsc 类型检查）
+        run: npm run build
+
+  # ---------------------------------------------------------------- 安全
+  security:
+    name: 安全扫描 (pip-audit / Trivy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: pip-audit 依赖漏洞
+        run: |
+          python -m pip install --upgrade pip pip-audit
+          python -m pip_audit -r backend/requirements.txt --progress-spinner off --strict
+
+      - name: Trivy 文件系统扫描
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+          format: table
+          skip-dirs: frontend/node_modules,frontend/dist,.git,release
+          trivyignores: .trivyignore
+
+  # ---------------------------------------------------------------- 容器
+  docker:
+    name: 容器镜像可构建 / compose 可解析
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: compose 配置校验
+        run: docker compose config --quiet
+
+      - name: 构建 api 镜像
+        run: docker build -f backend/Dockerfile.api -t data-agent-api:ci .
+
+      - name: 构建 worker 镜像
+        run: docker build -f backend/Dockerfile.worker -t data-agent-worker:ci .
+
+      - name: 构建 web 镜像
+        run: docker build -f frontend/Dockerfile -t data-agent-web:ci .
