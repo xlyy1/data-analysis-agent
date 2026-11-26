@@ -3,6 +3,7 @@
 > 面向中小工厂 / 电商商家的自然语言数据分析助手：**一句中文问题 → 只读 SQL → 图表 → 说人话的结论**，
 > 并且能说清结论是从哪几行数据来的。
 
+[![CI](https://github.com/xlyy1/data-analysis-agent/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/xlyy1/data-analysis-agent/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688)
 ![LangGraph](https://img.shields.io/badge/LangGraph-0.2-1C3C3C)

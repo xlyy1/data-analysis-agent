@@ -376,20 +376,45 @@ sec-llm-backend-1  StoppedAt=04:57:06Z  StartedAt=04:59:43Z  健康=healthy
 恢复后             api 回到 18000（本机 override），sec-llm 8000 正常，web 8080 正常
 ```
 
-## 12. CI 各 job 的等价执行记录
+## 12. CI 在 GitHub 托管 runner 上真跑（含首次失败与修复）
 
-没有远端仓库，无法真的触发 GitHub Actions。做法是**把每个 job 的命令在干净环境里逐条跑**：
+没有远端时只能等价执行；现在推到了 `github.com/xlyy1/data-analysis-agent`，
+**5 个 job 全部在 GitHub 托管 runner 上跑过**：
 
-| job | 执行方式 | 结果 |
-|---|---|---|
-| `backend` | 全新 venv（`python -m venv` + `pip install -r requirements-dev.txt`，不继承开发环境） | ruff `exit 0`；`273 passed`，覆盖率 **73.08%**（门槛 70）；`BASELINE OK`；`QUALITY GATE OK` |
-| `migrations` | **Git Bash**（POSIX shell，等价 ubuntu 的 bash）跑 `upgrade → heredoc 校验 → alembic check → downgrade base → upgrade` | 全部 `exit 0`，11 张表齐全，`JOB_RESULT: PASS`，`alembic current = 6baf502abe50 (head)` |
-| `frontend` | 删掉 `node_modules` 后只靠 lock：`npm ci → lint → build` | 三条 `exit 0`，`✓ built in 5.26s` |
-| `security` | `pip-audit` + `trivy fs` + `trivy image`（对 `:ci` 镜像） | `No known vulnerabilities found`；fs `0`；api:ci `0`；web:ci `0`；均 `exit 0` |
-| `docker` | `docker compose config --quiet` + 三个 `docker build -f ... -t xxx:ci .` | 四条 `exit 0` |
-| workflow 本身 | `actionlint .github/workflows/ci.yml`；并用 yaml 解析确认 heredoc 终止符渲染后仍在第 0 列 | `exit 0`；`heredoc terminator at column 0: True` |
+```console
+run #2  conclusion = success   https://github.com/xlyy1/data-analysis-agent/actions/runs/45793692309
+  [success] 后端 测试 / 覆盖率 / 回归基线      (59s)
+  [success] 空库迁移 / 回滚可重放              (35s)
+  [success] 容器镜像可构建 / compose 可解析    (123s)
+  [success] 前端 构建 / Lint                   (16s)
+  [success] 安全扫描 (pip-audit / Trivy)       (39s)
+```
 
-**与真 runner 的差异（仍未验证的部分）**：托管 runner 的操作系统（ubuntu-latest）与
-action 的运行时（`actions/setup-python`、`trivy-action` 包装层）没跑过。
-风险最高的两处已单独消除：bash heredoc（用 Git Bash 实跑 + YAML 渲染校验）、
-依赖完整性（用全新 venv 验证）。
+migrations job 的每个 step：`upgrade head → 校验关键表 → alembic check → downgrade → upgrade` 全 success；
+docker job 含 `构建 api/worker/web 镜像 → 扫描 api 镜像 → 扫描 web 镜像` 全 success。
+
+### 首次运行是失败的（记录在这里，因为这才是有用的信息）
+
+```console
+run #1  conclusion = failure   https://github.com/xlyy1/data-analysis-agent/actions/runs/45792288672
+  [success] 后端 / 空库迁移 / 前端
+  [failure] 容器镜像可构建      ← 卡在 "Set up job"，3 秒
+  [failure] 安全扫描            ← 同上
+日志原文：
+  ##[error]Unable to resolve action `aquasecurity/trivy-action@0.28.0`,
+            unable to find version `0.28.0`
+```
+
+根因：`trivy-action` 的 tag **带 `v` 前缀**（`v0.28.0`、`v0.36.0`…），我写成了 `0.28.0`。
+而且我把 `trivy image` 两步也加进了 docker job，所以两个 job 一起挂在 setup 阶段。
+修复：统一改成 `aquasecurity/trivy-action@v0.36.0`（3 处），重推后 run #2 全绿。
+
+> 这类错误 `actionlint` 抓不到（它不校验远端 action 是否存在），
+> 只有真跑一次才会暴露 —— 这也是为什么"本地等价执行"不能替代真 CI。
+
+### 与本地等价执行的对照
+
+之前（无远端时）我逐条跑过每个 job 的命令，结果与真 run 一致：
+后端 273 passed / 覆盖率 73% / 两个 bench 通过、migrations 11 张表 + `alembic check`、
+前端 `npm ci → lint → build`、Trivy fs 与镜像扫描均 0。
+**唯一没被本地等价执行覆盖、只能靠真 CI 暴露的，就是 action 引用是否可解析。**
