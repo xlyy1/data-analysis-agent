@@ -95,6 +95,7 @@ async def scheduled_analysis(payload: dict) -> dict:
                 schemas,
                 configs,
                 allow_write=False,
+                user_id=schedule.user_id,
             )
             answer = state.get("final_response") or "本次定时分析未产出结论。"
             metadata = build_assistant_metadata(state)

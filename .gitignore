@@ -53,3 +53,9 @@ release.zip
 
 # 本机专用 compose 覆盖（代理等环境差异）
 docker-compose.override.yml
+
+# Playwright 浜х墿
+test-results/
+playwright-report/
+blob-report/
+.playwright/

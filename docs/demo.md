@@ -418,3 +418,66 @@ run #1  conclusion = failure   https://github.com/xlyy1/data-analysis-agent/acti
 后端 273 passed / 覆盖率 73% / 两个 bench 通过、migrations 11 张表 + `alembic check`、
 前端 `npm ci → lint → build`、Trivy fs 与镜像扫描均 0。
 **唯一没被本地等价执行覆盖、只能靠真 CI 暴露的，就是 action 引用是否可解析。**
+
+## 13. 补齐三处"汇报过但没做到"的缺口
+
+上一轮梳理出三个已知缺口，这里逐个补上并留下证据。
+
+### 13.1 SQL 级限流（此前只有配置项，代码没读）
+
+`sql_rate_limit_per_minute` 原来只在 `config.py` 里声明，实际接线的只有登录限流。
+现在在 `execute_query` 里"安全闸通过、真正执行前"按用户扣配额：
+
+```console
+$ python -m pytest -q tests/test_sql_rate_limit.py
+9 passed
+
+覆盖的行为：
+- 上限内正常执行
+- 超限时【不连库】直接返回可读话术（断言 connector.calls 未增加）
+- 按用户分桶（alice 超限不影响 bob）
+- 被安全闸拒绝的 SQL 不占配额
+- 限流错误标记 error_non_retryable，路由直接去回答节点，不再回灌模型重写 SQL
+- 回答文案不再带"分析出错："前缀
+```
+
+### 13.2 审计查询接口（`operation_logs` 一直在写，但没人能读）
+
+```console
+$ curl -s "localhost:8000/api/audit?action=login&limit=2" -H "Authorization: Bearer $TOKEN"
+{"items":[{"id":"…","user_id":"…","action":"login","detail":{"role":"admin"},
+           "created_at":"2026-11-26T11:22:33+00:00"}],
+ "total":12,"limit":2,"offset":0,"filters":{…}}
+
+$ curl -s localhost:8000/api/audit/actions -H "Authorization: Bearer $TOKEN"
+{"items":[{"action":"login","count":12},{"action":"datasource_upload","count":3}, …]}
+```
+
+- 权限：只对 `audit:read` 开放（当前 = admin）；viewer / analyst 一律 403，匿名 401
+- 过滤：`action` / `user_id` / `since`；分页 `limit(1..200)` + `offset`
+- **返回前遮蔽敏感键**（password/token/secret/api_key…），审计表不能变成二次泄露源
+- `detail` 不是合法 JSON 时降级成 `{"_raw": …}`，不炸整个列表
+- 测试 13 条：`tests/test_audit_api.py`
+
+### 13.3 浏览器端到端冒烟进 CI（此前 UI 只靠人肉验）
+
+```console
+$ cd frontend && npm run test:e2e      # 本地用系统 Edge，CI 用 chromium
+  ok 1 鉴权 › 未登录访问受保护页面会被重定向到登录页
+  ok 2 鉴权 › 口令错误时给出可读的行内错误，且不会跳转
+  ok 3 鉴权 › 登录成功后进入对话页并带上身份
+  ok 4 具体问题：出 SQL + 图表 + 结果表
+  ok 5 模糊问题：不猜，给出澄清选项（并点选项续问）
+  ok 6 上传脏 CSV：给出清洗报告（断言丢弃空行/重复行/前导零三条 note）
+  ok 7 生成报告并下载 Markdown（真实 download 事件 + 文件名后缀）
+  7 passed (25.2s)
+```
+
+CI 里新增 `e2e` job：装后端依赖 → `npm ci` → `playwright install --with-deps chromium`
+→ 在同一个 step 里拉起 uvicorn(mock) 并跑 `npm run test:e2e`，失败时上传报告与后端日志。
+
+写这套测试时踩到并修掉的**测试自身缺陷**（都会造成假绿/假红）：
+1. 应用会恢复上次会话 → 断言命中历史消息；改成每个用例先开新会话
+2. `waitIdle` 在流式开始前就判定空闲 → 改成"等消息数 +2 且输入框回空闲"
+3. `getByText('查询结果')` 同时命中图表标题，严格模式报错 → 精确定位 `.result-table .card-title`
+4. 下载按钮文案是 `MD` 不是 `Markdown`

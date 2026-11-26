@@ -94,6 +94,7 @@ class ConversationService:
         datasource_schemas: list[str],
         datasource_configs: list[str],
         allow_write: bool,
+        user_id: str = "",
     ) -> AgentState:
         settings = get_settings()
         task_id = new_trace_id()
@@ -138,6 +139,8 @@ class ConversationService:
             "final_response": "",
             "error": "",
             "allow_write": allow_write,
+            "user_id": user_id,
+            "error_non_retryable": False,
         }
 
     async def run_agent(
@@ -149,6 +152,7 @@ class ConversationService:
         datasource_configs: list[str],
         *,
         allow_write: bool = False,
+        user_id: str = "",
         on_event: Callable[[dict], Awaitable[None]] | None = None,
     ) -> AgentState:
         """运行 Agent 并返回最终状态。
@@ -157,7 +161,13 @@ class ConversationService:
         仍然复用同一张图，非流式路径的行为完全不变。
         """
         initial_state = await self._initial_state(
-            conv_id, user_input, datasource_ids, datasource_schemas, datasource_configs, allow_write
+            conv_id,
+            user_input,
+            datasource_ids,
+            datasource_schemas,
+            datasource_configs,
+            allow_write,
+            user_id,
         )
         started = time.perf_counter()
         try:

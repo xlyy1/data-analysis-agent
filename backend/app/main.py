@@ -16,7 +16,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import auth, conversation, datasource, report, schedules, sql_debug, system, tasks
+from app.api import audit, auth, conversation, datasource, report, schedules, sql_debug, system, tasks
 from app.config import get_settings
 from app.core.errors import install_error_handlers
 from app.database import async_session, ensure_schema, init_db
@@ -98,6 +98,7 @@ app.include_router(datasource.router)
 app.include_router(report.router)
 app.include_router(schedules.router)
 app.include_router(sql_debug.router)
+app.include_router(audit.router)
 app.include_router(tasks.router)
 
 

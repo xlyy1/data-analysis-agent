@@ -8,7 +8,7 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688)
 ![LangGraph](https://img.shields.io/badge/LangGraph-0.2-1C3C3C)
 ![Vue3](https://img.shields.io/badge/Vue-3.5-42B883)
-![Tests](https://img.shields.io/badge/tests-273%20passed-brightgreen)
+![Tests](https://img.shields.io/badge/tests-295%20passed-brightgreen)
 ![Coverage](https://img.shields.io/badge/coverage-73%25-yellowgreen)
 
 ---
@@ -124,8 +124,9 @@ Windows 也可以直接双击 `start.bat`（会拉起三个进程）。
 | SQL 可执行率 | 100% | 同上 |
 | 平均生成延迟 | 1.5–2.1 s（DeepSeek，temperature=0） | 同上 |
 | 上下文压缩后事实留存 | 100%（token 压到 31.2%） | `bench/retention_hybrid_24x15.json` |
-| 后端测试 | **273 passed** | `cd backend && pytest -q` |
+| 后端测试 | **295 passed** | `cd backend && pytest -q` |
 | 覆盖率 | 73%（门槛 70%） | `pytest --cov=app --cov-fail-under=70` |
+| UI 冒烟 | 7/7（Playwright） | `cd frontend && npm run test:e2e` |
 | 依赖漏洞（HIGH/CRITICAL） | **0**（升级前 17 个） | `trivy fs --severity HIGH,CRITICAL --ignore-unfixed` |
 | 恶意 SQL 拦截 | 7/7 | `tests/test_sql_policy.py`、`tools/smoke_e2e.py §8` |
 | 端到端自检 | 45/45 | `python tools/smoke_e2e.py` |
@@ -192,15 +193,16 @@ curl -s -X POST localhost:8000/api/sql/validate \
 
 ```bash
 cd backend
-python -m pytest -q                        # 273 passed
+python -m pytest -q                        # 295 passed
 python -m ruff check .                     # All checks passed
 python -m pytest -q --cov=app --cov-fail-under=70
 python bench/agent_baseline.py             # 机制回归基线（离线）
 python bench/quality_gate.py               # 归档准确率门槛
-python tools/smoke_e2e.py --base-url http://127.0.0.1:8000   # 45 项端到端自检
+python tools/smoke_e2e.py --base-url http://127.0.0.1:8000   # 45 项接口端到端自检
 
 cd ../frontend
 npm ci && npm run lint && npm run build
+npm run test:e2e                           # 7 条浏览器冒烟：登录 / 提问 / 上传 / 报告下载
 ```
 
 安全扫描（CI 里同样的命令）：
@@ -218,9 +220,10 @@ trivy image --severity HIGH,CRITICAL --ignore-unfixed data-agent-api:latest
 actionlint .github/workflows/ci.yml
 ```
 
-CI（`.github/workflows/ci.yml`）四个 job：后端（lint + 测试 + 覆盖率 + 两个回归门）、
+CI（`.github/workflows/ci.yml`）**六个 job**：后端（lint + 测试 + 覆盖率 + 两个回归门）、
 迁移（空库 upgrade → `alembic check` → downgrade → upgrade）、前端（lint + build）、
-安全（`pip-audit` + Trivy）、容器（三个镜像可构建）。**全部离线，不碰付费 Key。**
+UI 冒烟（Playwright 7 条，起真实后端 + dev server）、安全（`pip-audit` + Trivy）、
+容器（三个镜像可构建 + 镜像扫描）。**全部离线，不碰付费 Key。**
 
 ---
 

@@ -40,8 +40,14 @@ def should_diagnose(state: AgentState) -> str:
 
 
 def route_after_execute(state: AgentState) -> str:
-    """执行后分三路：报错且还有重试次数则重写 SQL；空结果直接说明；否则进入分析。"""
+    """执行后分三路：报错且还有重试次数则重写 SQL；空结果直接说明；否则进入分析。
+
+    限流这类"重试也没用"的错误带 `error_non_retryable`，直接去回答节点，
+    否则每重试一次就再消耗一次配额，越限越糟。
+    """
     if state.get("error"):
+        if state.get("error_non_retryable"):
+            return "respond"
         retries = state.get("sql_retry_count", 0)
         if retries <= get_settings().max_sql_retries:
             return "retry"

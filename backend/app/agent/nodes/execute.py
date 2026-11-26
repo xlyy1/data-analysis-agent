@@ -20,9 +20,25 @@ from app.agent.validators import (
 from app.config import get_settings
 from app.datasource.factory import create_datasource
 from app.observability.metrics import sql_executed_total, sql_guarded_total
+from app.services.rate_limit import limiters
 from app.services.resilience import run_with_retry
 from app.services.sql_policy import cap_cells, guard_sql
 from app.services.sql_validator import validate_sql_columns
+
+# 限流时给用户看的话术（同时作为 error，由 respond 节点原样返回）
+RATE_LIMIT_MESSAGE = "查询过于频繁，已触发每分钟查询上限。请稍等片刻再试，或缩小查询范围减少重试。"
+
+
+def _sql_rate_limited(state: AgentState) -> bool:
+    """按用户 + 每分钟上限做 SQL 级限流。
+
+    只统计"真正要执行的查询"（安全闸通过之后），所以被拒绝的 SQL 不占配额；
+    命中的请求标记为不可重试，避免重试循环把配额越打越糟。
+    """
+    settings = get_settings()
+    limiter = limiters.get("sql_execute", settings.sql_rate_limit_per_minute, 60.0)
+    key = state.get("user_id") or "anonymous"
+    return not limiter.allow(key)
 
 
 def _datasource_label(cfg_str) -> str:
@@ -115,6 +131,16 @@ async def execute_query(state: AgentState) -> AgentState:
         sql_guarded_total.inc(reason="sql_limit_appended")
     # 后续执行用规整后的 SQL（已补 LIMIT），状态里的 generated_sql 保留原文给用户看
     sql = decision.sql
+
+    # 硬约束 4：SQL 级限流（按用户 / 每分钟），在真正执行前扣配额
+    if _sql_rate_limited(state):
+        sql_guarded_total.inc(reason="sql_rate_limited")
+        return {
+            **state,
+            "error": RATE_LIMIT_MESSAGE,
+            "sql_error": RATE_LIMIT_MESSAGE,
+            "error_non_retryable": True,
+        }
 
     # 多数据源并行：任一源成功即可继续，避免慢源拖住整条链路
     if settings.parallel_datasources and len(configs) > 1:

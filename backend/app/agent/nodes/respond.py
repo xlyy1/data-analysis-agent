@@ -66,6 +66,9 @@ async def format_response(state: AgentState) -> AgentState:
 
     # 执行失败：直接回传错误，不进入分析
     if state.get("error"):
+        # 限流这类错误自带可读话术，不需要"分析出错"前缀（重试也没意义）
+        if state.get("error_non_retryable"):
+            return {**state, "final_response": str(state["error"])}
         return {**state, "final_response": f"分析出错：{state['error']}"}
 
     llm = get_llm()

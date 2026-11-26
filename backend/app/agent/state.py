@@ -82,3 +82,9 @@ class AgentState(TypedDict):
 
     # 是否允许执行写 SQL（默认 False；只有管理员 + 打开 SQL_ALLOW_WRITE_FOR_ADMIN 才可能为真）
     allow_write: bool
+
+    # 发起本次分析的账号（用于 SQL 级限流的 key；定时任务里是计划的所有者）
+    user_id: str
+
+    # 不可重试的错误（如触发限流）：命中后直接走回答节点，不再回灌模型重写 SQL
+    error_non_retryable: bool

@@ -198,6 +198,7 @@ async def chat(
         schemas,
         configs,
         allow_write=_allow_write(user),
+        user_id=user.id,
     )
 
     if state.get("needs_clarification"):
@@ -265,6 +266,7 @@ async def chat_stream(
                 schemas,
                 configs,
                 allow_write=_allow_write(user),
+                user_id=user.id,
                 on_event=on_event,
             )
         )
