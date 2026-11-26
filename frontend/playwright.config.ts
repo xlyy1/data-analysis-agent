@@ -33,10 +33,12 @@ export default defineConfig({
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: startOwnServer
     ? {
-        command: 'npm run dev -- --port 5173 --strictPort',
+        // 必须显式 --host 127.0.0.1：Linux runner 上 `localhost` 可能先解析到 ::1，
+        // 而健康检查打的是 127.0.0.1，会导致 "Timed out waiting from config.webServer"。
+        command: 'npm run dev -- --host 127.0.0.1 --port 5173 --strictPort',
         url: 'http://127.0.0.1:5173',
         reuseExistingServer: !process.env.CI,
-        timeout: 120_000,
+        timeout: 180_000,
       }
     : undefined,
 })

@@ -1,4 +1,4 @@
-﻿import { writeFileSync } from 'node:fs'
+import { writeFileSync } from 'node:fs'
 
 import { expect, test } from '@playwright/test'
 
