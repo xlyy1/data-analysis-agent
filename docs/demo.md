@@ -412,6 +412,32 @@ run #1  conclusion = failure   https://github.com/xlyy1/data-analysis-agent/acti
 > 这类错误 `actionlint` 抓不到（它不校验远端 action 是否存在），
 > 只有真跑一次才会暴露 —— 这也是为什么"本地等价执行"不能替代真 CI。
 
+### 加了 E2E job 之后又失败过一次（run #6）
+
+```console
+run #6: 5/6 success，e2e job 挂在 "启动后端（mock LLM）并跑冒烟"
+  日志：api is up                              ← 后端没问题
+        Error: Timed out waiting 120000ms from config.webServer.   ← vite 没被连上
+```
+
+根因：Linux runner 上 `localhost` 可能先解析到 `::1`，而 Playwright 的 webServer
+健康检查打的是 `127.0.0.1`。修复：`npm run dev -- --host 127.0.0.1 --port 5173 --strictPort`。
+
+**run #7（当前 HEAD）6/6 全绿**：
+
+```console
+run #7  conclusion = success  https://github.com/xlyy1/data-analysis-agent/actions/runs/45794674866
+  [success] 空库迁移 / 回滚可重放              (29s)
+  [success] 后端 测试 / 覆盖率 / 回归基线      (52s)
+  [success] 容器镜像可构建 / compose 可解析    (120s)
+  [success] 端到端 UI 冒烟 (Playwright)        (76s)   ← 新增
+  [success] 安全扫描 (pip-audit / Trivy)       (35s)
+  [success] 前端 构建 / Lint                   (21s)
+
+e2e job 内部：api is up → 7 passed (9.8s)
+```
+
+
 ### 与本地等价执行的对照
 
 之前（无远端时）我逐条跑过每个 job 的命令，结果与真 run 一致：
