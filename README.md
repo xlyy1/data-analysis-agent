@@ -8,7 +8,7 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688)
 ![LangGraph](https://img.shields.io/badge/LangGraph-0.2-1C3C3C)
 ![Vue3](https://img.shields.io/badge/Vue-3.5-42B883)
-![Tests](https://img.shields.io/badge/tests-268%20passed-brightgreen)
+![Tests](https://img.shields.io/badge/tests-273%20passed-brightgreen)
 ![Coverage](https://img.shields.io/badge/coverage-73%25-yellowgreen)
 
 ---
@@ -16,7 +16,7 @@
 ## 30 秒看懂
 
 ```
-"各城市的销售额排名"
+"2026年各城市的销售额排名"
         │
         ▼
 ┌──────────────────────────────────────────────────────────────┐
@@ -46,6 +46,10 @@
 | 数据源（清洗报告 + 画像） | 报告 / 定时任务 |
 |---|---|
 | ![数据源](docs/images/03-datasources.png) | ![报告](docs/images/04-reports.png) |
+
+> 对话页那张是**真实 DeepSeek** 跑出来的（SQL 带日期过滤、答案含排名表与对比分析）；
+> 其余页面来自 Docker 栈（含上传的 CSV 与定时任务历史）。演示问题请带时间范围
+> （如"2026年各城市的销售额排名"），否则按 PRD 会先反问时间段。
 
 ---
 
@@ -120,8 +124,9 @@ Windows 也可以直接双击 `start.bat`（会拉起三个进程）。
 | SQL 可执行率 | 100% | 同上 |
 | 平均生成延迟 | 1.5–2.1 s（DeepSeek，temperature=0） | 同上 |
 | 上下文压缩后事实留存 | 100%（token 压到 31.2%） | `bench/retention_hybrid_24x15.json` |
-| 后端测试 | **268 passed** | `cd backend && pytest -q` |
+| 后端测试 | **273 passed** | `cd backend && pytest -q` |
 | 覆盖率 | 73%（门槛 70%） | `pytest --cov=app --cov-fail-under=70` |
+| 依赖漏洞（HIGH/CRITICAL） | **0**（升级前 17 个） | `trivy fs --severity HIGH,CRITICAL --ignore-unfixed` |
 | 恶意 SQL 拦截 | 7/7 | `tests/test_sql_policy.py`、`tools/smoke_e2e.py §8` |
 | 端到端自检 | 45/45 | `python tools/smoke_e2e.py` |
 
@@ -157,7 +162,7 @@ curl -s -X POST localhost:8000/api/auth/login \
 # 提问（非流式）
 curl -s -X POST localhost:8000/api/conversations/chat \
   -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
-  -d '{"message":"各城市的销售额排名"}'
+  -d '{"message":"2026年各城市的销售额排名"}'
 
 # SSE 流式
 curl -N -X POST localhost:8000/api/conversations/chat/stream \
@@ -187,7 +192,7 @@ curl -s -X POST localhost:8000/api/sql/validate \
 
 ```bash
 cd backend
-python -m pytest -q                        # 268 passed
+python -m pytest -q                        # 273 passed
 python -m ruff check .                     # All checks passed
 python -m pytest -q --cov=app --cov-fail-under=70
 python bench/agent_baseline.py             # 机制回归基线（离线）
@@ -196,6 +201,18 @@ python tools/smoke_e2e.py --base-url http://127.0.0.1:8000   # 45 项端到端�
 
 cd ../frontend
 npm ci && npm run lint && npm run build
+```
+
+安全扫描（CI 里同样的命令）：
+
+```bash
+# 依赖漏洞：当前 0 个 HIGH/CRITICAL（升级前 17 个，用升级修掉，.trivyignore 无豁免）
+trivy fs --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed \
+  --skip-dirs frontend/node_modules --skip-dirs frontend/dist --exit-code 1 .
+pip-audit -r backend/requirements.txt   # No known vulnerabilities found
+
+# workflow 本身也用 actionlint 校验过（exit 0）
+actionlint .github/workflows/ci.yml
 ```
 
 CI（`.github/workflows/ci.yml`）四个 job：后端（lint + 测试 + 覆盖率 + 两个回归门）、
@@ -235,7 +252,7 @@ backend/
     observability/ trace / 结构化日志 / 指标
   alembic/         数据库迁移
   bench/           评测与回归门
-  tests/           268 个测试
+  tests/           273 个测试
   tools/           smoke_e2e.py 等
 frontend/          Vue3 + TDesign + ECharts（Nginx 托管）
 docs/              audit / architecture / PRD / demo / alerts / pitch

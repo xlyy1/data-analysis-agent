@@ -1,10 +1,11 @@
-# 一键启动：api + task-worker + web(Nginx)
+﻿# 一键启动：api + task-worker + web(Nginx)
 #
 #   docker compose up -d --build --wait
 #   打开 http://localhost:8080 ，用 admin / admin12345 登录（首次启动自动创建）
 #
 # 默认 LLM_PROVIDER=mock：不填任何 Key 也能把整条链路点通。
-# 要用真模型：在 .env 里设置 LLM_PROVIDER=deepseek 和 DEEPSEEK_API_KEY，再 up 一次。
+# 要用真模型：设置 LLM_PROVIDER=deepseek 和 LLM_API_KEY（容器专用变量，故意不用 DEEPSEEK_API_KEY，
+# 这样宿主 .env 里的真实 Key 不会被 docker compose config 回显）
 
 name: data-agent
 
@@ -17,7 +18,7 @@ services:
       APP_ENV: ${APP_ENV:-prod}
       AUTH_SECRET_KEY: ${AUTH_SECRET_KEY:-dev-only-change-me-in-production}
       LLM_PROVIDER: ${LLM_PROVIDER:-mock}
-      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      DEEPSEEK_API_KEY: ${LLM_API_KEY:-}
       DEEPSEEK_MODEL: ${DEEPSEEK_MODEL:-deepseek-chat}
       TASK_WORKERS: ${TASK_WORKERS:-4}
       TASK_MAX_RETRIES: ${TASK_MAX_RETRIES:-1}
@@ -44,7 +45,7 @@ services:
       BOOTSTRAP_ADMIN_USERNAME: ${BOOTSTRAP_ADMIN_USERNAME:-admin}
       BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-admin12345}
       LLM_PROVIDER: ${LLM_PROVIDER:-mock}
-      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      DEEPSEEK_API_KEY: ${LLM_API_KEY:-}
       DEEPSEEK_MODEL: ${DEEPSEEK_MODEL:-deepseek-chat}
       TASK_SERVICE_URL: http://task-worker:8001
       SAMPLE_SEED_ENABLED: "true"

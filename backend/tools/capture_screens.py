@@ -22,7 +22,7 @@ PAGES = [
     ("/schedules", "05-schedules.png"),
 ]
 
-QUESTION = "各城市的销售额排名"
+QUESTION = "2026年各城市的销售额排名"
 
 
 def login_tokens(page, base_url: str, username: str, password: str) -> dict:
@@ -40,7 +40,18 @@ def main() -> int:
     parser.add_argument("--out", default="../docs/images")
     parser.add_argument("--username", default="admin")
     parser.add_argument("--password", default="admin12345")
+    parser.add_argument(
+        "--only",
+        default="",
+        help="只抓指定页，逗号分隔（chat,datasources,reports,schedules）；默认全抓",
+    )
     args = parser.parse_args()
+    wanted = {item.strip() for item in args.only.split(",") if item.strip()} or {
+        "chat",
+        "datasources",
+        "reports",
+        "schedules",
+    }
 
     out_dir = Path(args.out)
     if not out_dir.is_absolute():
@@ -67,29 +78,39 @@ def main() -> int:
             [tokens["access_token"], tokens["refresh_token"]],
         )
 
-        # 对话页：真的发一个问题，等图表渲染出来再截图
-        page.goto(f"{args.base_url}/", wait_until="networkidle")
-        page.wait_for_selector(".chat-input", timeout=20000)
-        page.fill(".chat-input", QUESTION)
-        page.keyboard.press("Enter")
-        try:
-            # 等 SQL 代码块或图表出现，最多 40s
-            page.wait_for_function(
-                """() => {
-                    const text = document.body.innerText || '';
-                    const hasSql = text.includes('SELECT') || text.toLowerCase().includes('limit');
-                    const hasCanvas = !!document.querySelector('canvas');
-                    return hasSql && hasCanvas;
-                }""",
-                timeout=40000,
-            )
-        except Exception as error:  # noqa: BLE001 - 截不到理想状态也要出图
-            print(f"[warn] 等待答案渲染超时：{error}", file=sys.stderr)
-        page.wait_for_timeout(1500)
-        page.screenshot(path=str(out_dir / "02-chat.png"), full_page=False)
-        print("captured 02-chat.png")
+        # 对话页：开一个新对话 → 发一个带时间范围的问题 → 等回答生成完再截图
+        if "chat" in wanted:
+            page.goto(f"{args.base_url}/", wait_until="networkidle")
+            page.wait_for_selector(".chat-input", timeout=20000)
+            new_chat = page.query_selector(".new-chat")
+            if new_chat:
+                new_chat.click()
+                page.wait_for_timeout(600)
+            page.fill(".chat-input", QUESTION)
+            page.keyboard.press("Enter")
+            try:
+                # 等"生成结束"：输入框回到提问态 + 已有 SQL + 已有图表
+                page.wait_for_function(
+                    """() => {
+                        const box = document.querySelector('.chat-input');
+                        const idle = box && !box.placeholder.includes('正在生成');
+                        const text = document.body.innerText || '';
+                        const hasSql = text.includes('SELECT');
+                        const hasCanvas = !!document.querySelector('canvas');
+                        return idle && hasSql && hasCanvas;
+                    }""",
+                    timeout=120000,
+                )
+            except Exception as error:  # noqa: BLE001 - 没等到理想状态也要出图
+                print(f"[warn] 等待回答生成结束超时：{error}", file=sys.stderr)
+            page.wait_for_timeout(1200)
+            page.screenshot(path=str(out_dir / "02-chat.png"), full_page=False)
+            print("captured 02-chat.png")
 
         for path, filename in PAGES[1:]:
+            key = filename.split("-", 1)[1].rsplit(".", 1)[0]
+            if key not in wanted:
+                continue
             page.goto(f"{args.base_url}{path}", wait_until="networkidle")
             page.wait_for_timeout(1500)
             page.screenshot(path=str(out_dir / filename), full_page=False)

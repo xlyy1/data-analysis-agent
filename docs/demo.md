@@ -149,14 +149,14 @@ $ curl -s -X POST ".../api/datasources/$ID/reingest?append=true"
 
 ```console
 $ cd backend && python -m pytest -q
-268 passed
+273 passed
 
 $ python -m ruff check .
 All checks passed!
 
 $ python -m pytest -q --cov=app --cov-fail-under=70
-TOTAL  4425  1047  73%
-268 passed
+TOTAL                                  4465   1053   1032    152    73%
+273 passed
 
 $ python bench/agent_baseline.py
 {"cases": 8, "clarification_accuracy": 1.0, "exec_rate": 1.0,
@@ -245,3 +245,102 @@ LLM_PROVIDER=deepseek
 DEEPSEEK_API_KEY=sk-...
 docker compose up -d --build
 ```
+
+## 9. 真实 DeepSeek 复跑（不是 mock）
+
+### 9.1 留出集准确率复现（25 条，2026-11-26 实跑）
+
+```console
+$ LLM_PROVIDER=deepseek python tests/evaluate_text2sql_holdout.py \
+      --temperature 0 --output %TEMP%\holdout_reverify.json --verbose
+[OK ] 一共多少笔到店记录 | 期望≈8000.00 实得≈8000.00
+[OK ] 各城市的到店记录数是多少 | 期望7行 实得7行
+[OK ] 消费金额最高的门店是哪个 | 期望包含「滨江店」实得「滨江店」
+[OK ] 华东区域占整体消费金额的比例是多少 | 期望≈37.73 实得≈37.73
+…（25/25 全部 OK）
+{"dataset":"holdout_visits.db","holdout":true,"cases":25,
+ "correct_rate":1.0,"exec_rate":1.0,"avg_gen_ms":1620.4,"avg_exec_ms":3.1,"misses":[]}
+```
+
+归档里的 100% 不是历史遗留数字，用今天的模型重跑仍然成立（写入临时文件，**未覆盖归档**）。
+
+### 9.2 端到端问答（真实模型，3 问）
+
+```console
+Q1: 2026年各城市的销售额排名        (6528 ms)
+SQL: SELECT "城市", ROUND(SUM("销售额"), 2) AS "销售额" FROM "订单明细"
+     WHERE "订单日期" >= '2026-01-01' AND "订单日期" <= '2026-11-26'
+     GROUP BY "城市" ORDER BY "销售额" DESC LIMIT 100
+chart_type: bar | series: 1 | x轴点数: 4
+answer: 2026年各城市销售额排名已出炉，**杭州以224,216.99元拔得头筹**…
+        （给出排名表 + 计算说明 + 两梯队对比 + 最高最低相差 15.6%）
+
+Q2: 2026年哪个渠道的利润最低，为什么   (12837 ms)
+SQL: 一次查出 利润/销售额/成本/利润率/毛利率/订单数 6 个指标，ORDER BY 总利润 ASC
+causes: 4 条（定价偏低、成本控制弱、规模效应未体现、大客户议价）
+suggestions: 4 条（如"毛利率低于30%的SKU提价5%-8%""单笔毛利率门槛38%"）
+answer: 给出"批发利润最低 76,116.41 元 / 利润率 34.01%"的结论 + 归因 + 可执行建议
+
+Q3: 帮我看看销售情况                (1439 ms)
+needs_clarification = true
+question: 请问您想看哪个时间范围的销售情况，以及关注哪个指标？
+options: ['本月销售额','上个月销售额','今年销售额','今年各月销售额趋势','各城市销售额对比']
+```
+
+**同一套问题在 mock 下也能跑通，但文案是模板**（"数值最高的分组明显领先…"）。
+所以 `docs/images/02-chat.png` 这张截图是用真实 DeepSeek 生成的，其余页面截图来自
+Docker 栈（带上传的 CSV 与定时任务历史）。
+
+### 9.3 一个被真实模型纠正的文档错误
+
+用真实模型跑"**各城市的销售额排名**"（不带时间范围）时，Agent **先反问时间段**，
+不会直接出 SQL。这不是 bug：`docs/PRD.md` 明确要求"指标/时间/粒度缺一即澄清"。
+是 README 里的示例问题与 PRD 自相矛盾（mock 的启发式恰好没触发澄清，掩盖了这一点）。
+已把文档里的示例统一改成带时间范围的写法，并注明"不带时间会先澄清"。
+
+## 10. 依赖与流水线安全扫描（真跑）
+
+```console
+$ trivy fs --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed \
+    --skip-dirs frontend/node_modules --skip-dirs frontend/dist --exit-code 1 .
+（升级前）
+  @vue/server-renderer 3.5.35  GHSA-g2v6-rqmx-r4w6  fix=3.5.42,3.6.0-rc.6  HIGH
+  axios                1.17.0  CVE-2026-101898/101901/101903/101905/101906/101907/101909/67320  HIGH
+  follow-redirects     1.16.0  CVE-2026-111755/111756/116689  HIGH
+  form-data            4.0.5   CVE-2026-12143  HIGH
+  nanoid               3.3.12  CVE-2026-67213/67214  HIGH
+  postcss              8.5.15  CVE-2026-73646  HIGH
+  source-map-js        1.2.1   CVE-2026-93749  HIGH
+  TOTAL_VULNS 17                                  → exit 1
+
+$ npm install --save vue@^3.5.42 axios@^1.20.0 && npm update
+（升级后）
+  frontend/package-lock.json │ npm │ 0
+  TRIVY_EXITCODE=0
+```
+
+17 → 0，是**升级依赖**换来的，`.trivyignore` 里没有任何豁免项。
+升级后 `npm run lint` / `npm run build` 仍然 exit 0（vue 3.5.46 / axios 1.21.1）。
+
+> `npm audit` 在本机不可用（registry 是 npmmirror，`/-/npm/v1/security/*` 未实现），
+> 所以依赖漏洞只能靠 Trivy —— 这也是坚持把它放进 CI 的原因。
+
+```console
+$ actionlint .github/workflows/ci.yml
+ACTIONLINT_EXITCODE=0
+```
+
+## 11. 默认端口验证边界
+
+```console
+$ docker compose config | grep -E 'published|target'
+  target: 8000   published: "8000"     # API
+  target: 80     published: "8080"     # Web
+```
+
+| 端口 | 结果 | 证据 |
+|---|---|---|
+| Web `8080` | ✅ **实跑通过** | `web/healthz → ok`、SPA `HTTP 200`、`/api/health → {"status":"ok"}`、经 nginx 登录 `200` |
+| API `8000` | ❌ **本机无法验证** | 端口被 `wslrelay`(IPv6 `::1`) + `com.docker.backend` 占用；`docker run -p 8000:80` 与 `-p 0.0.0.0:8000:80` 均报 `Bind for 0.0.0.0:8000 failed: port is already allocated` |
+
+本机用 `docker-compose.override.yml`（已 gitignore）把 API 映射到 18000；干净机器上默认值可用。
