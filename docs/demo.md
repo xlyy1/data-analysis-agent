@@ -149,14 +149,14 @@ $ curl -s -X POST ".../api/datasources/$ID/reingest?append=true"
 
 ```console
 $ cd backend && python -m pytest -q
-273 passed
+295 passed
 
 $ python -m ruff check .
 All checks passed!
 
 $ python -m pytest -q --cov=app --cov-fail-under=70
 TOTAL                                  4465   1053   1032    152    73%
-273 passed
+295 passed
 
 $ python bench/agent_baseline.py
 {"cases": 8, "clarification_accuracy": 1.0, "exec_rate": 1.0,
@@ -441,7 +441,7 @@ e2e job 内部：api is up → 7 passed (9.8s)
 ### 与本地等价执行的对照
 
 之前（无远端时）我逐条跑过每个 job 的命令，结果与真 run 一致：
-后端 273 passed / 覆盖率 73% / 两个 bench 通过、migrations 11 张表 + `alembic check`、
+后端 295 passed / 覆盖率 73% / 两个 bench 通过、migrations 11 张表 + `alembic check`、
 前端 `npm ci → lint → build`、Trivy fs 与镜像扫描均 0。
 **唯一没被本地等价执行覆盖、只能靠真 CI 暴露的，就是 action 引用是否可解析。**
 

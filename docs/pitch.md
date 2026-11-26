@@ -52,7 +52,7 @@
 > 我接手的时候这个项目 95 个测试是绿的，但**认证模块只剩 .pyc**、没有迁移、
 > 前端 `npm run build` 直接失败。审计写在 `docs/audit.md` 里。
 >
-> 现在：273 个测试、覆盖率 73%（门槛 70%）、ruff 干净、五个 CI job
+> 现在：295 个测试、覆盖率 73%（门槛 70%）、ruff 干净、五个 CI job
 > （后端 / 空库迁移 + `alembic check` / 前端 / pip-audit + Trivy / 三个镜像可构建）。
 >
 > 迁移那块值得说一句：`models/__init__.py` 原来是空的，`operation_logs` 这张表
@@ -95,7 +95,7 @@
   并输出可直接调试的判定原因。
 - 补齐工程化最后一公里：JWT + refresh 轮换 + 三级 RBAC、Alembic 迁移与启动自愈、上传清洗（保前导零、
   行哈希增量去重、路径穿越防护）、定时分析（数据库唯一约束幂等 + 失败隔离 + 连续失败自停）、统一错误体 +
-  request_id + `/healthz /readyz /metrics`；测试 **95 → 273**、覆盖率 **73%**、5 个 CI job，
+  request_id + `/healthz /readyz /metrics`；测试 **95 → 295**、覆盖率 **73%**、5 个 CI job，
   依赖漏洞 HIGH/CRITICAL 从 **17 清到 0**。
 
 ### 第 4 条（加分：证明能在别人代码里定位问题）
@@ -117,7 +117,7 @@
 | 309 条 / 100% / 1.6s | `backend/bench/README.md`、`backend/tests/data/*.result.json` |
 | 留出集可复现 | `python tests/evaluate_text2sql_holdout.py --temperature 0`（25/25） |
 | SQL 只读闸 | `backend/app/services/sql_policy.py`、`tests/test_sql_policy.py` |
-| 273 测试 / 73% | `cd backend && pytest -q --cov=app --cov-fail-under=70` |
+| 295 测试 / 73% | `cd backend && pytest -q --cov=app --cov-fail-under=70` |
 | 17 → 0 漏洞 | `docs/demo.md §10`（fs 与 image 两层） |
 | CI 全绿（5 job） | https://github.com/xlyy1/data-analysis-agent/actions （run #2/#3 success） |
 | 三个缺陷修复 | `tests/test_diagnose_contract.py`、`app/core/sqlite.py`、`tests/test_schedules_api.py` |

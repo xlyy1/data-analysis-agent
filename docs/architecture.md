@@ -204,7 +204,7 @@ backend/
     services/        业务：auth / ingest / profiling / schema / sql_policy / scheduler / task_queue / report ...
   alembic/           迁移脚本
   bench/             评测与回归门（agent_baseline / quality_gate / 上下文压缩）
-  tests/             273 个测试
+  tests/             295 个测试
   tools/             smoke_e2e.py 等运维脚本
 frontend/            Vue3 + TDesign + ECharts，Nginx 托管
 docs/                audit / architecture / PRD / demo / pitch / alerts

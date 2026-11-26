@@ -258,7 +258,7 @@ backend/
     observability/ trace / 结构化日志 / 指标
   alembic/         数据库迁移
   bench/           评测与回归门
-  tests/           273 个测试
+  tests/           295 个测试
   tools/           smoke_e2e.py 等
 frontend/          Vue3 + TDesign + ECharts（Nginx 托管）
 docs/              audit / architecture / PRD / demo / alerts / pitch
