@@ -99,25 +99,6 @@ Windows 也可以直接双击 `start.bat`（会拉起三个进程）。
 
 ---
 
-### ⚠️ 部署前必须改的三处（默认值写在仓库里，公开可见）
-
-| 配置 | 默认值 | 风险 |
-|---|---|---|
-| `AUTH_SECRET_KEY` | `dev-only-change-me-in-production` | 用它签发的 JWT 可被伪造 → 换随机串 |
-| `BOOTSTRAP_ADMIN_PASSWORD` | `admin12345` | 仓库公开 = 管理员口令公开（演示账号仅限本地） |
-| `CORS_ORIGINS` | `*` | 任意站点可跨域调接口 → 生产写具体域名 |
-
-```bash
-# 生成密钥
-python -c "import secrets;print(secrets.token_urlsafe(48))"
-```
-
-**仓库里不含真实凭据**：`.env` 从未被提交（全历史扫描过），`.env.example` 所有 Key 字段为空，
-`data/` 被 gitignore。用 Docker 时 Compose 只从 `LLM_API_KEY` 取模型 Key（不引用 `DEEPSEEK_API_KEY`），
-避免 `docker compose config` 回显宿主的真实 Key。
-
----
-
 ## 核心能力
 
 | 能力 | 实现 | 证据 |
@@ -306,6 +287,7 @@ docs/              audit / architecture / PRD / demo / alerts / pitch
 | 调度器没有领导者选举 | 靠 `schedule_runs` 唯一约束保证幂等，不是真分布式调度 |
 | `mock` 模型不衡量质量 | 它只保证链路通；真实效果必须用 DeepSeek/Ollama 实测 |
 | PDF 中文依赖系统字体 | 容器内已装 `fonts-noto-cjk`；本地未装时退化为 ASCII |
+| 演示默认凭据 | 仓库里是 `admin/admin12345` 与占位 `AUTH_SECRET_KEY`；对外部署前必须替换，见 [docs/security.md](docs/security.md) |
 
 这些取舍的理由写在 [`docs/architecture.md §5`](docs/architecture.md)。
 
