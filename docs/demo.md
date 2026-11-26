@@ -353,7 +353,7 @@ $ actionlint .github/workflows/ci.yml
 ACTIONLINT_EXITCODE=0
 ```
 
-## 11. 默认端口验证边界
+## 11. 默认端口验证
 
 ```console
 $ docker compose config | grep -E 'published|target'
@@ -363,7 +363,33 @@ $ docker compose config | grep -E 'published|target'
 
 | 端口 | 结果 | 证据 |
 |---|---|---|
-| Web `8080` | ✅ **实跑通过** | `web/healthz → ok`、SPA `HTTP 200`、`/api/health → {"status":"ok"}`、经 nginx 登录 `200` |
-| API `8000` | ❌ **本机无法验证** | 端口被 `wslrelay`(IPv6 `::1`) + `com.docker.backend` 占用；`docker run -p 8000:80` 与 `-p 0.0.0.0:8000:80` 均报 `Bind for 0.0.0.0:8000 failed: port is already allocated` |
+| Web `8080` | ✅ 实跑通过 | `web/healthz → ok`、SPA `HTTP 200`、`/api/health → {"status":"ok"}`、经 nginx 登录 `200` |
+| API `8000` | ✅ 实跑通过 | 临时让出端口（见下）后按默认 compose 启动：三个探针 `200`、`/docs 200`、`smoke_e2e.py` **45/45** |
 
-本机用 `docker-compose.override.yml`（已 gitignore）把 API 映射到 18000；干净机器上默认值可用。
+8000 一开始被**另一个项目**的容器 `sec-llm-backend-1` 占用。经确认后临时停止它、
+用默认端口启动本项目并完整跑了一遍自检，再原样 `docker start` 恢复：
+
+```
+sec-llm-backend-1  StoppedAt=04:57:06Z  StartedAt=04:59:43Z  健康=healthy
+                   → 对方停机 2 分 37 秒（原计划约 1 分钟，实际更久，已如实记录）
+本项目             api 0.0.0.0:8000->8000 healthy，45/45 通过
+恢复后             api 回到 18000（本机 override），sec-llm 8000 正常，web 8080 正常
+```
+
+## 12. CI 各 job 的等价执行记录
+
+没有远端仓库，无法真的触发 GitHub Actions。做法是**把每个 job 的命令在干净环境里逐条跑**：
+
+| job | 执行方式 | 结果 |
+|---|---|---|
+| `backend` | 全新 venv（`python -m venv` + `pip install -r requirements-dev.txt`，不继承开发环境） | ruff `exit 0`；`273 passed`，覆盖率 **73.08%**（门槛 70）；`BASELINE OK`；`QUALITY GATE OK` |
+| `migrations` | **Git Bash**（POSIX shell，等价 ubuntu 的 bash）跑 `upgrade → heredoc 校验 → alembic check → downgrade base → upgrade` | 全部 `exit 0`，11 张表齐全，`JOB_RESULT: PASS`，`alembic current = 6baf502abe50 (head)` |
+| `frontend` | 删掉 `node_modules` 后只靠 lock：`npm ci → lint → build` | 三条 `exit 0`，`✓ built in 5.26s` |
+| `security` | `pip-audit` + `trivy fs` + `trivy image`（对 `:ci` 镜像） | `No known vulnerabilities found`；fs `0`；api:ci `0`；web:ci `0`；均 `exit 0` |
+| `docker` | `docker compose config --quiet` + 三个 `docker build -f ... -t xxx:ci .` | 四条 `exit 0` |
+| workflow 本身 | `actionlint .github/workflows/ci.yml`；并用 yaml 解析确认 heredoc 终止符渲染后仍在第 0 列 | `exit 0`；`heredoc terminator at column 0: True` |
+
+**与真 runner 的差异（仍未验证的部分）**：托管 runner 的操作系统（ubuntu-latest）与
+action 的运行时（`actions/setup-python`、`trivy-action` 包装层）没跑过。
+风险最高的两处已单独消除：bash heredoc（用 Git Bash 实跑 + YAML 渲染校验）、
+依赖完整性（用全新 venv 验证）。
