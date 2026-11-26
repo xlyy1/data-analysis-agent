@@ -1,4 +1,4 @@
-name: CI
+﻿name: CI
 
 on:
   push:
@@ -150,7 +150,7 @@ jobs:
           python -m pip_audit -r backend/requirements.txt --progress-spinner off --strict
 
       - name: Trivy 文件系统扫描
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: fs
           scan-ref: .
@@ -182,7 +182,7 @@ jobs:
 
       # 文件系统扫描只看依赖清单；基础镜像的系统包要扫镜像本身才看得见
       - name: 扫描运行镜像（OS 包 + 依赖）
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: image
           image-ref: data-agent-api:ci
@@ -193,7 +193,7 @@ jobs:
           trivyignores: .trivyignore
 
       - name: 扫描 web 镜像
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: image
           image-ref: data-agent-web:ci
