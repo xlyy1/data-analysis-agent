@@ -79,26 +79,60 @@
 
 ---
 
-## 二、3 条简历要点（可直接用）
+## 二、简历怎么写
 
-> **对话式数据分析 Agent｜Python / FastAPI / LangGraph / Vue3**
->
-> - 设计并实现 8 节点 LangGraph 分析链路（意图理解 → 澄清 → NL2SQL → 只读执行 → 分析 → 诊断 → 可视化 → 回答），
->   支持节点级 SSE 流式、SQL 失败回写重试、多数据源并行与部分成功降级；在 5 套数据集 **309 条 NL2SQL 用例**上
->   正确率与可执行率均达 **100%**（含 2 套未参与调参的留出集），平均生成延迟 1.5–2.1s。
->
-> - 在**执行侧**落地 SQL 只读安全策略（单语句 / 长度上限 / 危险函数 / 自动 LIMIT / 单元格上限），
->   用"字面量与注释打码后再判关键字"避免误伤；7 类注入与破坏性输入全部拦截，并把判定做成可调试的
->   `POST /api/sql/validate`。
->
-> - 补齐工程化最后一公里：JWT + refresh 轮换 + admin/analyst/viewer 三级 RBAC、Alembic 迁移与启动自愈、
->   数据源 CRUD 与上传清洗（幂等增量、路径穿越防护）、报告落库、定时分析（数据库唯一约束幂等 + 失败隔离）、
->   统一错误体与 request_id、`/healthz /readyz /metrics`；后端测试从 95 增至 **273**，覆盖率 73%，
->   建 5 个 CI job（含空库迁移校验、pip-audit / Trivy），CI 全程不依赖付费 Key。
+### 项目一行
 
-> 备选（更偏数据/AI 方向时替换第一条）：
+> **对话式数据分析 Agent**｜Python / FastAPI / LangGraph / SQLAlchemy(async) / Vue3 / Docker｜个人项目｜2026
+
+### 主推 3 条（粘贴即用）
+
+- 设计并实现 **8 节点 LangGraph** 分析链路（意图理解 → 澄清 → NL2SQL → 只读执行 → 分析 → 诊断 → 可视化 → 回答），
+  支持节点级 SSE 流式、SQL 失败回写重试、多数据源并行与部分成功降级；在 **5 套数据集 309 条 NL2SQL 用例**上
+  正确率与可执行率均 **100%**（含 2 套未参与提示词调参的留出集），平均生成 **1.6s**。
+- 在**执行侧**落地 SQL 只读安全策略（单语句 / 长度上限 / 危险函数拦截 / 自动补 LIMIT / 按列数折算行数上限），
+  用「先给字符串字面量与注释打码、再匹配关键字」避免误伤业务数据；**7 类**注入与破坏性输入 100% 拦截，
+  并输出可直接调试的判定原因。
+- 补齐工程化最后一公里：JWT + refresh 轮换 + 三级 RBAC、Alembic 迁移与启动自愈、上传清洗（保前导零、
+  行哈希增量去重、路径穿越防护）、定时分析（数据库唯一约束幂等 + 失败隔离 + 连续失败自停）、统一错误体 +
+  request_id + `/healthz /readyz /metrics`；测试 **95 → 273**、覆盖率 **73%**、5 个 CI job，
+  依赖漏洞 HIGH/CRITICAL 从 **17 清到 0**。
+
+### 第 4 条（加分：证明能在别人代码里定位问题）
+
+- 在既有代码中定位并修复 3 个隐蔽缺陷：`/readyz` 与链路追踪每次调用泄漏一个 SQLite 句柄（112 条
+  `ResourceWarning`）、诊断建议因模型输出契约不一致被**静默丢弃**、删除带历史记录的定时计划触发外键 **500**；
+  均补充回归测试。
+
+### 备选（投数据 / AI 方向时替换第 1 条）
+
 > 设计**上下文压缩**方案解决长会话膨胀：LLM 摘要 + 抽取式兜底的混合策略，在 24 段会话 × 15 个埋点事实的
-> 评测中把事实留存从纯抽取式的 **4.2%** 提升到 **100%**，token 压到 31.2%。
+> 评测中把事实留存从纯抽取式的 **4.2%** 提升到 **100%**，token 压到 **31.2%**。
+> ⚠️ 这组数字来自仓库归档评测（`bench/retention_*.json`），不是本次会话复测的；写上前请确认自己能讲清口径。
+
+### 每条的证据锚点（被追问时立刻能打开）
+
+| 结论 | 打开这里 |
+|---|---|
+| 309 条 / 100% / 1.6s | `backend/bench/README.md`、`backend/tests/data/*.result.json` |
+| 留出集可复现 | `python tests/evaluate_text2sql_holdout.py --temperature 0`（25/25） |
+| SQL 只读闸 | `backend/app/services/sql_policy.py`、`tests/test_sql_policy.py` |
+| 273 测试 / 73% | `cd backend && pytest -q --cov=app --cov-fail-under=70` |
+| 17 → 0 漏洞 | `docs/demo.md §10`（fs 与 image 两层） |
+| 三个缺陷修复 | `tests/test_diagnose_contract.py`、`app/core/sqlite.py`、`tests/test_schedules_api.py` |
+| 幂等调度 | `tests/test_scheduler.py::TestClaim::test_same_slot_is_idempotent` |
+
+### 不要写（会被一句追问打穿）
+
+| 别写 | 为什么 |
+|---|---|
+| "自研 / 微调 NL2SQL 模型" | 没微调，是 prompt + schema linking + 规则校验 |
+| "准确率 100%" 单独出现 | 必须带"309 条 / 5 套数据 / 2 套留出集"限定 |
+| "支撑 X 万用户 / 日均 X 请求" | 没有真实流量 |
+| "分布式调度 / 多副本一致性" | 单机方案，幂等靠数据库唯一约束 |
+| "基于 RAG / 向量检索" | 没做向量检索 |
+| "CI 已全部通过"（配徽章） | 无远端仓库，没跑过托管 runner；写"建立 5 个 CI job"即可 |
+| "Trivy 通过 = 安全达标" | 只覆盖依赖与 OS 包的已知 CVE |
 
 ---
 
