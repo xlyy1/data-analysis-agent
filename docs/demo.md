@@ -1,4 +1,4 @@
-﻿# 验收记录（demo）
+# 验收记录（demo）
 
 > 所有输出都是本机真实执行结果，不是"预期结果"。
 > 环境：Windows 11 · Python 3.13（镜像内 3.12）· Node 22 · Docker 29.7.2
@@ -324,6 +324,29 @@ $ npm install --save vue@^3.5.42 axios@^1.20.0 && npm update
 
 > `npm audit` 在本机不可用（registry 是 npmmirror，`/-/npm/v1/security/*` 未实现），
 > 所以依赖漏洞只能靠 Trivy —— 这也是坚持把它放进 CI 的原因。
+
+### 10.1 镜像扫描（文件系统扫描看不到系统包）
+
+```console
+$ trivy image --severity HIGH,CRITICAL --ignore-unfixed data-agent-api:latest
+（修复前）
+data-agent-api:latest (debian 13.8)   Total: 1 (HIGH: 1)
+  libzstd1  CVE-2026-124851  1.5.7+dfsg-1 → 1.5.7+dfsg-1+deb13u1   HIGH  exit 1
+
+$ trivy image ... data-agent-web:latest
+（修复前）pcre2 / tiff / zlib 多条 HIGH（zlib 1.3.1-r2 → 1.3.2-r1 等）  exit 1
+```
+
+修复方式是在 Dockerfile 里升级基础包（`apt-get upgrade -y` / `apk upgrade --no-cache`），
+不是加豁免：
+
+```console
+$ trivy image ... data-agent-api:latest          → 0 vulnerabilities   exit 0
+$ trivy image ... data-agent-task-worker:latest  → 0 vulnerabilities   exit 0
+$ trivy image ... data-agent-web:latest (alpine 3.21.3) → 0 vulnerabilities   exit 0
+```
+
+CI 的 docker job 里已加上这两个 `trivy image` 步骤。
 
 ```console
 $ actionlint .github/workflows/ci.yml

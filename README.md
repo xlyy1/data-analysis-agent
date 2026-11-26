@@ -211,6 +211,9 @@ trivy fs --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed \
   --skip-dirs frontend/node_modules --skip-dirs frontend/dist --exit-code 1 .
 pip-audit -r backend/requirements.txt   # No known vulnerabilities found
 
+# 运行镜像的 OS 包（当前三个镜像均 0 HIGH/CRITICAL）
+trivy image --severity HIGH,CRITICAL --ignore-unfixed data-agent-api:latest
+
 # workflow 本身也用 actionlint 校验过（exit 0）
 actionlint .github/workflows/ci.yml
 ```

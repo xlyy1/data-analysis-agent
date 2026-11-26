@@ -179,3 +179,26 @@ jobs:
 
       - name: 构建 web 镜像
         run: docker build -f frontend/Dockerfile -t data-agent-web:ci .
+
+      # 文件系统扫描只看依赖清单；基础镜像的系统包要扫镜像本身才看得见
+      - name: 扫描运行镜像（OS 包 + 依赖）
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: image
+          image-ref: data-agent-api:ci
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+          format: table
+          trivyignores: .trivyignore
+
+      - name: 扫描 web 镜像
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: image
+          image-ref: data-agent-web:ci
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+          format: table
+          trivyignores: .trivyignore

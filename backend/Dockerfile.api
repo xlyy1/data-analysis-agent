@@ -7,9 +7,12 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# 中文报告 PDF 需要 CJK 字体；curl 用于健康检查排查
+# 中文报告 PDF 需要 CJK 字体；curl 用于健康检查排查。
+# 额外做一次 upgrade：基础镜像(digest)里可能带已知 CVE 的系统包，
+# trivy image 扫描会报出来（例如 libzstd1），升级基础包即可修掉。
 RUN apt-get update \
     && apt-get install -y --no-install-recommends fonts-noto-cjk curl \
+    && apt-get upgrade -y \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

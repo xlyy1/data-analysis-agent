@@ -11,6 +11,10 @@ RUN npm run build
 
 FROM nginx:1.27-alpine
 
+# 基础镜像里的 zlib/tiff/pcre2 等系统包可能有已修复的 CVE（trivy image 会报），
+# 先升级再拷产物，避免把漏洞带进运行镜像。
+RUN apk upgrade --no-cache
+
 COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
 
