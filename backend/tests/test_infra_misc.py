@@ -1,4 +1,4 @@
-﻿"""零散但重要的模块测试：Mock LLM、限流器、LLM 超时包装、SQL 校验接口、路径解析。"""
+"""零散但重要的模块测试：Mock LLM、限流器、LLM 超时包装、SQL 校验接口、路径解析。"""
 
 from __future__ import annotations
 

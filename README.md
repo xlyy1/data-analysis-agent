@@ -1,4 +1,4 @@
-﻿# 对话式数据分析 Agent
+# 对话式数据分析 Agent
 
 > 面向中小工厂 / 电商商家的自然语言数据分析助手：**一句中文问题 → 只读 SQL → 图表 → 说人话的结论**，
 > 并且能说清结论是从哪几行数据来的。
@@ -96,6 +96,25 @@ cd frontend && npm install && npm run dev    # http://localhost:5199
 ```
 
 Windows 也可以直接双击 `start.bat`（会拉起三个进程）。
+
+---
+
+### ⚠️ 部署前必须改的三处（默认值写在仓库里，公开可见）
+
+| 配置 | 默认值 | 风险 |
+|---|---|---|
+| `AUTH_SECRET_KEY` | `dev-only-change-me-in-production` | 用它签发的 JWT 可被伪造 → 换随机串 |
+| `BOOTSTRAP_ADMIN_PASSWORD` | `admin12345` | 仓库公开 = 管理员口令公开（演示账号仅限本地） |
+| `CORS_ORIGINS` | `*` | 任意站点可跨域调接口 → 生产写具体域名 |
+
+```bash
+# 生成密钥
+python -c "import secrets;print(secrets.token_urlsafe(48))"
+```
+
+**仓库里不含真实凭据**：`.env` 从未被提交（全历史扫描过），`.env.example` 所有 Key 字段为空，
+`data/` 被 gitignore。用 Docker 时 Compose 只从 `LLM_API_KEY` 取模型 Key（不引用 `DEEPSEEK_API_KEY`），
+避免 `docker compose config` 回显宿主的真实 Key。
 
 ---
 

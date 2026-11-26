@@ -17,7 +17,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve()
 BACKEND = HERE.parents[1]
-XLSX = Path(r"D:\data-agent\_app_data_所有对话_主对话_销售数据 (1).xlsx")
+XLSX = Path(os.getenv("EVAL_XLSX") or (BACKEND.parent / "data" / "sales_source.xlsx"))
 FALLBACK_DIR = BACKEND / "tests" / "data"
 
 sys.path.insert(0, str(BACKEND))
@@ -318,6 +318,15 @@ async def main() -> int:
     from app.agent.nodes.query import generate_query
     from app.datasource.excel import ExcelDataSource
 
+    if not XLSX.exists():
+        raise SystemExit(
+            f"找不到评测源数据：{XLSX}\n"
+            "这个评测依赖原始 Excel（未入库）。两种方式提供：\n"
+            "  1) 设置环境变量 EVAL_XLSX=/path/to/源数据.xlsx\n"
+            "  2) 把文件放到 <repo>/data/sales_source.xlsx\n"
+            "回归用的历史结果已归档在 tests/data/text2sql.result.json，"
+            "CI 走 bench/quality_gate.py 校验，不需要重跑本脚本。"
+        )
     ds = ExcelDataSource(file_path=str(XLSX), file_name=XLSX.name)
     await ds.connect()
     ds.auto_add_total_columns()

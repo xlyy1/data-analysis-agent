@@ -17,7 +17,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve()
 BACKEND = HERE.parents[1]
 DATASET = HERE.parent / "data" / "clarification_eval.json"
-FALLBACK_DIR = Path(r"C:\Users\dly20\Documents\deepseek-harness\default-workspace\resume-rebuild\results")
+FALLBACK_DIR = HERE.parent / "data"  # 结果目录与其它评测一致，不再依赖本机绝对路径
 
 sys.path.insert(0, str(BACKEND))
 

@@ -1,4 +1,4 @@
-﻿"""Excel / CSV 数据源
+"""Excel / CSV 数据源
 
 上传的文件会被解析为 SQLite 内存数据库中的表，通过 SQL 查询。
 """

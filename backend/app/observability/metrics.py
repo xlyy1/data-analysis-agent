@@ -1,4 +1,4 @@
-﻿"""极简 Prometheus 指标（纯标准库，不引入 prometheus_client）。
+"""极简 Prometheus 指标（纯标准库，不引入 prometheus_client）。
 
 为什么自己写：只需要 counter + histogram + gauge 三种，文本格式固定，
 少一个依赖就少一次供应链审计和版本冲突。

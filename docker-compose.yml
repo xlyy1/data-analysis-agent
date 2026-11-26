@@ -1,4 +1,4 @@
-﻿# 一键启动：api + task-worker + web(Nginx)
+# 一键启动：api + task-worker + web(Nginx)
 #
 #   docker compose up -d --build --wait
 #   打开 http://localhost:8080 ，用 admin / admin12345 登录（首次启动自动创建）
