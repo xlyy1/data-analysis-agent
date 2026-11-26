@@ -119,6 +119,7 @@
 | SQL 只读闸 | `backend/app/services/sql_policy.py`、`tests/test_sql_policy.py` |
 | 273 测试 / 73% | `cd backend && pytest -q --cov=app --cov-fail-under=70` |
 | 17 → 0 漏洞 | `docs/demo.md §10`（fs 与 image 两层） |
+| CI 全绿（5 job） | https://github.com/xlyy1/data-analysis-agent/actions （run #2/#3 success） |
 | 三个缺陷修复 | `tests/test_diagnose_contract.py`、`app/core/sqlite.py`、`tests/test_schedules_api.py` |
 | 幂等调度 | `tests/test_scheduler.py::TestClaim::test_same_slot_is_idempotent` |
 
@@ -131,7 +132,7 @@
 | "支撑 X 万用户 / 日均 X 请求" | 没有真实流量 |
 | "分布式调度 / 多副本一致性" | 单机方案，幂等靠数据库唯一约束 |
 | "基于 RAG / 向量检索" | 没做向量检索 |
-| "CI 已全部通过"（配徽章） | 无远端仓库，没跑过托管 runner；写"建立 5 个 CI job"即可 |
+| ~~"CI 已全部通过"~~ | ✅ 现在可以写了：5 个 job 已在 GitHub 托管 runner 上真跑全绿，附 run 链接即可 |
 | "Trivy 通过 = 安全达标" | 只覆盖依赖与 OS 包的已知 CVE |
 
 ---
