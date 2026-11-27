@@ -94,9 +94,10 @@
   用「先给字符串字面量与注释打码、再匹配关键字」避免误伤业务数据；**7 类**注入与破坏性输入 100% 拦截，
   并输出可直接调试的判定原因。
 - 补齐工程化最后一公里：JWT + refresh 轮换 + 三级 RBAC、Alembic 迁移与启动自愈、上传清洗（保前导零、
-  行哈希增量去重、路径穿越防护）、定时分析（数据库唯一约束幂等 + 失败隔离 + 连续失败自停）、统一错误体 +
-  request_id + `/healthz /readyz /metrics`；测试 **95 → 295**、覆盖率 **73%**、5 个 CI job，
-  依赖漏洞 HIGH/CRITICAL 从 **17 清到 0**。
+  行哈希增量去重、路径穿越防护）、定时分析（数据库唯一约束幂等 + 失败隔离 + 连续失败自停）、
+  SQL 级限流与**审计查询接口**（敏感字段返回前遮蔽）、统一错误体 + request_id +
+  `/healthz /readyz /metrics`；测试 **95 → 295**、覆盖率 **73%**、**6 个 CI job**（含 Playwright
+  端到端 7 条），依赖漏洞 HIGH/CRITICAL 从 **17 清到 0**（文件系统 + 镜像两层扫描）。
 
 ### 第 4 条（加分：证明能在别人代码里定位问题）
 
@@ -117,9 +118,12 @@
 | 309 条 / 100% / 1.6s | `backend/bench/README.md`、`backend/tests/data/*.result.json` |
 | 留出集可复现 | `python tests/evaluate_text2sql_holdout.py --temperature 0`（25/25） |
 | SQL 只读闸 | `backend/app/services/sql_policy.py`、`tests/test_sql_policy.py` |
+| SQL 限流（按用户/分钟） | `backend/app/agent/nodes/execute.py`、`tests/test_sql_rate_limit.py` |
+| 审计查询 + 敏感字段遮蔽 | `backend/app/api/audit.py`、`tests/test_audit_api.py` |
 | 295 测试 / 73% | `cd backend && pytest -q --cov=app --cov-fail-under=70` |
+| 7 条浏览器端到端 | `cd frontend && npm run test:e2e` |
 | 17 → 0 漏洞 | `docs/demo.md §10`（fs 与 image 两层） |
-| CI 全绿（5 job） | https://github.com/xlyy1/data-analysis-agent/actions （run #2/#3 success） |
+| CI 全绿（6 job） | https://github.com/xlyy1/data-analysis-agent/actions （run #7/#8 success） |
 | 三个缺陷修复 | `tests/test_diagnose_contract.py`、`app/core/sqlite.py`、`tests/test_schedules_api.py` |
 | 幂等调度 | `tests/test_scheduler.py::TestClaim::test_same_slot_is_idempotent` |
 
@@ -132,7 +136,7 @@
 | "支撑 X 万用户 / 日均 X 请求" | 没有真实流量 |
 | "分布式调度 / 多副本一致性" | 单机方案，幂等靠数据库唯一约束 |
 | "基于 RAG / 向量检索" | 没做向量检索 |
-| ~~"CI 已全部通过"~~ | ✅ 现在可以写了：5 个 job 已在 GitHub 托管 runner 上真跑全绿，附 run 链接即可 |
+| ~~"CI 已全部通过"~~ | ✅ 现在可以写了：6 个 job（含 Playwright 端到端）已在 GitHub 托管 runner 上真跑全绿，附 run 链接即可 |
 | "Trivy 通过 = 安全达标" | 只覆盖依赖与 OS 包的已知 CVE |
 
 ---
